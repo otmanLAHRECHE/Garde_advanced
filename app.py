@@ -225,7 +225,14 @@ class AppUi(QtWidgets.QMainWindow):
             self.dialog.close()
 
     def edit_worker(self):
-        print("ok")
+        ch = 0
+        for row in range(self.table_workers.rowCount()):
+            if self.table_workers.cellWidget(row, 1).check.isChecked():
+                ch = ch + 1
+        if ch > 1:
+            self.alert_("selectioner just une travailleur")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
 
     def delete_worker(self):
         print("ok")
