@@ -7,6 +7,9 @@ from PyQt5.QtCore import QSize, QPropertyAnimation, QDate
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidgetItem, qApp, QCompleter
 
+from custom_widgets import Check
+from dialogs import Threading_loading
+from threads import ThreadAddWorker, ThreadLoadWorkers
 
 WINDOW_SIZE = 0
 
@@ -84,6 +87,11 @@ class AppUi(QtWidgets.QMainWindow):
         self.table_workers = self.findChild(QtWidgets.QTableWidget, "tableWidget_4")
         self.table_gardes = self.findChild(QtWidgets.QTableWidget, "tableWidget_5")
 
+        self.table_workers.hideColumn(0)
+        self.table_gardes.hideColumn(0)
+        self.table_gardes.setColumnWidth(1, 40)
+        self.table_workers.setColumnWidth(1, 40)
+
         self.worker_name = self.findChild(QtWidgets.QLineEdit, "lineEdit_2")
 
 
@@ -102,6 +110,15 @@ class AppUi(QtWidgets.QMainWindow):
         self.recap_button = self.findChild(QtWidgets.QPushButton, "pushButton_24")
         self.statestiques_button = self.findChild(QtWidgets.QPushButton, "pushButton_25")
         self.statestiques_button.setIcon(QIcon("./icons/file-text.png"))
+
+        self.add_worker_button.clicked.connect(self.add_worker)
+        self.edit_worker_button.clicked.connect(self.edit_worker)
+        self.delete_worker_button.clicked.connect(self.delete_worker)
+        self.add_planing_button.clicked.connect(self.add_planing)
+        self.delete_planing_button.clicked.connect(self.delete_planing)
+        self.garde_button.clicked.connect(self.garde)
+        self.recap_button.clicked.connect(self.recap)
+        self.statestiques_button.clicked.connect(self.statestiques)
 
         if self.service == "urgence":
             self.ttl.setText("EPSP Djanet ( Medecins d'urgence )")
@@ -145,7 +162,60 @@ class AppUi(QtWidgets.QMainWindow):
             self.statestiques_button.setEnabled(False)
 
 
+    def add_worker(self):
+        if self.worker_name.text() == "":
+            message = 'Le champ de nom est vide!'
+            self.alert_(message)
+        else:
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.dialog.show()
 
+            self.thr = ThreadAddWorker(self.service, self.worker_name.text())
+            self.thr._signal.connect(self.signal_add_worker)
+            self.thr._signal_result.connect(self.signal_add_worker)
+            self.thr.start()
+
+    def signal_add_worker(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.load_workers()
+
+    def load_workers(self):
+        self.dialog = Threading_loading()
+        self.dialog.ttl.setText("إنتظر من فضلك")
+        self.dialog.progress.setValue(0)
+        self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.dialog.show()
+
+        self.thr = ThreadLoadWorkers(self.service)
+        self.thr._signal.connect(self.signal_load_workers)
+        self.thr._signal_list.connect(self.signal_load_workers)
+        self.thr._signal_result.connect(self.signal_load_workers)
+        self.thr.start()
+
+    def signal_load_workers(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+            row = progress[0]
+            worker = progress[1]
+            self.table_workers.insertRow(row)
+            check = Check()
+            self.table_workers.setItem(row, 0, QTableWidgetItem(str(worker[0])))
+            self.table_workers.setCellWidget(row, 1, check)
+            self.table_workers.setItem(row, 2, QTableWidgetItem(str(worker[1])))
+            self.table_workers.setItem(row, 3, QTableWidgetItem(str(worker[2])))
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
 
 
     def alert_(self, message):

@@ -40,9 +40,13 @@ class ThreadLoadWorkers(QThread):
             self._signal.emit(i)
 
         workers = load_workers(self.service)
-
+        index = 0
         for worker in workers:
-            self._signal_list.emit(worker)
+            list = []
+            list.append(index)
+            list.append(worker)
+            self._signal_list.emit(list)
+            index = index + 1
 
         for i in range(30, 99):
             self._signal.emit(i)
@@ -142,9 +146,13 @@ class ThreadLoadGardeMonth(QThread):
             self._signal.emit(i)
 
         months = load_garde_month(self.service)
-
+        index = 0
         for month in months:
-            self._signal_list.emit(month)
+            list = []
+            list.append(index)
+            list.append(month)
+            self._signal_list.emit(list)
+            index = index + 1
 
         for i in range(30, 99):
             self._signal.emit(i)

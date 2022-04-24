@@ -522,7 +522,7 @@ background-position: center left;</string>
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="home">
              <widget class="QLabel" name="label">
@@ -713,7 +713,7 @@ background-position: center left;</string>
               </column>
               <column>
                <property name="text">
-                <string>Medecin</string>
+                <string>Nom et prenom</string>
                </property>
                <property name="font">
                 <font>
