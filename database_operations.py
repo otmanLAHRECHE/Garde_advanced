@@ -37,3 +37,22 @@ def delete_worker(id):
     cur.execute(sql_q, (id,))
     connection.commit()
     connection.close()
+
+
+def load_garde_month(service):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = 'SELECT * FROM guard_mounth where service=? ORDER BY m ASC'
+    cur.execute(sql_q, (service,))
+    results = cur.fetchall()
+    connection.close()
+    return results
+
+
+def delete_garde_month(id):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = 'DELETE FROM guard_mounth WHERE guard_mounth_id=?'
+    cur.execute(sql_q, (id,))
+    connection.commit()
+    connection.close()
