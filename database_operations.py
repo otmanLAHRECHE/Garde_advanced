@@ -48,6 +48,23 @@ def load_garde_month(service):
     connection.close()
     return results
 
+def add_garde_month(month, year, service):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = "INSERT INTO guard_mounth (m,y,service) values (?,?,?)"
+    guard = (month, year, service)
+    cur.execute(sql_q, guard)
+    connection.commit()
+
+def check_month(month, year, service):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = 'SELECT count(*) FROM guard_mounth where guard_mounth.m =? and guard_mounth.y =? and guard_mounth.service =? '
+    cur.execute(sql_q, (month, year, service))
+    res = cur.fetchall()
+    connection.close()
+    return res
+
 
 def delete_garde_month(id):
     connection = sqlite3.connect("database/sqlite.db")
