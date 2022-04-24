@@ -231,18 +231,21 @@ class ThreadDeleteGardeMonth(QThread):
         self._signal_result.emit(True)
 
 
-class ThreadGuardSurv(QThread):
+class ThreadGuard(QThread):
     _signal = pyqtSignal(int)
     _signal_result = pyqtSignal(list)
 
     def __init__(self, service, num_days, month, year):
-        super(ThreadGuardSurv, self).__init__()
+        super(ThreadGuard, self).__init__()
         self.num_days = num_days
         self.month = month
         self.year = year
         self.service = service
 
-        self.data = [("Jours", "Date", "De 08h:00 à 16h:00", "De 16h:00 à 08h:00")]
+        if self.service == "inf" or self.service == "radio" or self.service == "labo" or self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+            self.data = [("Jours", "Date", "De 08h:00 à 16h:00", "De 16h:00 à 08h:00")]
+        else:
+            self.data = [("Jours", "Date", "De 08h:00 à 20h:00", "De 20h:00 à 08h:00")]
 
     def __del__(self):
         self.terminate()
@@ -257,6 +260,12 @@ class ThreadGuardSurv(QThread):
             prog = row * 100 / self.num_days
             day = row + 1
             x = datetime.datetime(self.year, self.month, day)
+            if self.service == "urgence" or self.service == "dentiste":
+                light = "Dr/ "
+                night = "Dr/ "
+            else:
+                light = ""
+                night = ""
             m = ""
             if x.strftime("%A") == "Saturday":
                 m = "Samedi"
@@ -292,8 +301,6 @@ class ThreadGuardSurv(QThread):
             cur.execute(sql_q, ('urgence_surv', 'night', day, self.month, self.year))
             results_night = cur.fetchall()
 
-            light = ""
-            night = ""
 
             if results_light:
                 rl = results_light[0]
