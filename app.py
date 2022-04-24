@@ -526,6 +526,9 @@ class AppUi(QtWidgets.QMainWindow):
         background-position: center left;""")
         self.fragment.setCurrentIndex(1)
 
+        self.table_gardes.setRowCount(0)
+        self.load_garde_month()
+
 
 
     def sett(self):
