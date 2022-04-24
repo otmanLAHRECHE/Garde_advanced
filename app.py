@@ -8,8 +8,8 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidgetItem, qApp, QCompleter
 
 from custom_widgets import Check
-from dialogs import Threading_loading
-from threads import ThreadAddWorker, ThreadLoadWorkers
+from dialogs import Threading_loading, Update_worker_dialog
+from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker
 
 WINDOW_SIZE = 0
 
@@ -228,14 +228,80 @@ class AppUi(QtWidgets.QMainWindow):
         ch = 0
         for row in range(self.table_workers.rowCount()):
             if self.table_workers.cellWidget(row, 1).check.isChecked():
+                row_selected = row
                 ch = ch + 1
-        if ch > 1:
+        if ch > 1 or ch ==0:
             self.alert_("selectioner just une travailleur")
             for row in range(self.table_workers.rowCount()):
                 self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            dialog = Update_worker_dialog()
+            if dialog.exec() == QtWidgets.QDialog.Accepted:
+                if dialog.worker.text() == "":
+                    message = "enter un valide nom"
+                    self.alert_(message)
+                else:
+                    self.dialog = Threading_loading()
+                    self.dialog.ttl.setText("إنتظر من فضلك")
+                    self.dialog.progress.setValue(0)
+                    self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                    self.dialog.show()
+
+                    self.thr = ThreadUpdateWorker(int(self.table_workers.item(row_selected, 0).text()), dialog.worker.text())
+                    self.thr._signal.connect(self.signal_edit_worker)
+                    self.thr._signal_list.connect(self.signal_edit_worker)
+                    self.thr._signal_result.connect(self.signal_edit_worker)
+                    self.thr.start()
+
+    def signal_edit_worker(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.table_workers.setRowCount(0)
+            self.load_workers()
 
     def delete_worker(self):
-        print("ok")
+        ch = 0
+        for row in range(self.table_workers.rowCount()):
+            if self.table_workers.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just une travailleur")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            dialog = Update_worker_dialog()
+            if dialog.exec() == QtWidgets.QDialog.Accepted:
+                if dialog.worker.text() == "":
+                    message = "enter un valide nom"
+                    self.alert_(message)
+                else:
+                    self.dialog = Threading_loading()
+                    self.dialog.ttl.setText("إنتظر من فضلك")
+                    self.dialog.progress.setValue(0)
+                    self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                    self.dialog.show()
+
+                    self.thr = ThreadUpdateWorker(int(self.table_workers.item(row_selected, 0).text()),
+                                                  dialog.worker.text())
+                    self.thr._signal.connect(self.signal_delete_worker)
+                    self.thr._signal_list.connect(self.signal_delete_worker)
+                    self.thr._signal_result.connect(self.signal_delete_worker)
+                    self.thr.start()
+
+    def signal_delete_worker(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.table_workers.setRowCount(0)
+            self.load_workers()
 
     def add_planing(self):
         print("ok")

@@ -200,5 +200,5 @@ class ThreadAddGardeMonth(QThread):
             for i in range(30, 99):
                 self._signal.emit(i)
 
-            self._signal_result.emit(True)
+            self._signal_result.emit(False)
 
