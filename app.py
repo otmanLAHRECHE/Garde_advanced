@@ -94,6 +94,10 @@ class AppUi(QtWidgets.QMainWindow):
         self.table_workers.setColumnWidth(1, 40)
         self.table_workers.setColumnWidth(2, 200)
 
+        self.table_gardes.setColumnWidth(2, 200)
+        self.table_gardes.setColumnWidth(3, 200)
+        self.table_gardes.setColumnWidth(4, 300)
+
         self.worker_name = self.findChild(QtWidgets.QLineEdit, "lineEdit_2")
 
 

@@ -522,7 +522,7 @@ background-position: center left;</string>
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="home">
              <widget class="QLabel" name="label">
@@ -711,7 +711,7 @@ background-position: center left;</string>
               </column>
               <column>
                <property name="text">
-                <string> </string>
+                <string/>
                </property>
               </column>
               <column>
@@ -838,10 +838,10 @@ background-position: center left;</string>
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
               <property name="selectionMode">
-               <enum>QAbstractItemView::SingleSelection</enum>
+               <enum>QAbstractItemView::NoSelection</enum>
               </property>
               <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
+               <enum>QAbstractItemView::SelectItems</enum>
               </property>
               <property name="gridStyle">
                <enum>Qt::SolidLine</enum>
@@ -856,7 +856,7 @@ background-position: center left;</string>
               </column>
               <column>
                <property name="text">
-                <string> </string>
+                <string/>
                </property>
               </column>
               <column>
