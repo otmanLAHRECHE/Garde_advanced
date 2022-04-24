@@ -147,21 +147,6 @@ class AppUi(QtWidgets.QMainWindow):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def alert_(self, message):
         alert = QMessageBox()
         alert.setWindowTitle("alert")
@@ -192,7 +177,7 @@ class AppUi(QtWidgets.QMainWindow):
         if width == 50:
             # Expand menu
             newWidth = 180
-            self.pushButton_4.setText(" Medecins")
+            self.pushButton_4.setText(" Travailleurs")
             self.pushButton_3.setText(" Planing")
             self.pushButton_2.setText("  Parametre")
 
