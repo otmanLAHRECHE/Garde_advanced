@@ -147,6 +147,7 @@ class AppUi(QtWidgets.QMainWindow):
 
 
 
+
     def alert_(self, message):
         alert = QMessageBox()
         alert.setWindowTitle("alert")
