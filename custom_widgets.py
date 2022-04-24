@@ -7,7 +7,7 @@ class Check(QWidget):
         super(Check, self).__init__()
 
         layout = QtWidgets.QHBoxLayout()
-        self.check = QtWidgets.QCheckBox
+        self.check = QtWidgets.QCheckBox()
         self.check.setFixedHeight(30)
         self.check.setFixedWidth(30)
 

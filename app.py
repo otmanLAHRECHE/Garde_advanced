@@ -91,6 +91,7 @@ class AppUi(QtWidgets.QMainWindow):
         self.table_gardes.hideColumn(0)
         self.table_gardes.setColumnWidth(1, 40)
         self.table_workers.setColumnWidth(1, 40)
+        self.table_workers.setColumnWidth(2, 200)
 
         self.worker_name = self.findChild(QtWidgets.QLineEdit, "lineEdit_2")
 
@@ -162,6 +163,10 @@ class AppUi(QtWidgets.QMainWindow):
             self.statestiques_button.setEnabled(False)
 
 
+        self.load_workers()
+
+
+
     def add_worker(self):
         if self.worker_name.text() == "":
             message = 'Le champ de nom est vide!'
@@ -205,8 +210,10 @@ class AppUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(progress)
         elif type(progress) == list:
             row = progress[0]
+            print(row)
             worker = progress[1]
             self.table_workers.insertRow(row)
+            self.table_workers.setRowHeight(row, 40)
             check = Check()
             self.table_workers.setItem(row, 0, QTableWidgetItem(str(worker[0])))
             self.table_workers.setCellWidget(row, 1, check)
@@ -216,6 +223,27 @@ class AppUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("Terminer")
             self.dialog.close()
+
+    def edit_worker(self):
+        print("ok")
+
+    def delete_worker(self):
+        print("ok")
+
+    def add_planing(self):
+        print("ok")
+
+    def delete_planing(self):
+        print("ok")
+
+    def garde(self):
+        print("ok")
+
+    def recap(self):
+        print("ok")
+
+    def statestiques(self):
+        print("ok")
 
 
     def alert_(self, message):
@@ -288,6 +316,10 @@ class AppUi(QtWidgets.QMainWindow):
         self.fragment.setCurrentIndex(0)
 
 
+        self.table_workers.setRowCount(0)
+        self.load_workers()
+
+
     def sort(self):
         self.pushButton_3.setStyleSheet("""background-color: rgb(0, 92, 157);
         background-repeat: none;
@@ -302,6 +334,8 @@ class AppUi(QtWidgets.QMainWindow):
         padding-left: 50px;
         background-position: center left;""")
         self.fragment.setCurrentIndex(1)
+
+
 
     def sett(self):
         self.pushButton_2.setStyleSheet("""background-color: rgb(0, 92, 157);

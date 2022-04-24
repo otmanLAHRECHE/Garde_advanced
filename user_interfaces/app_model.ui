@@ -687,7 +687,7 @@ background-position: center left;</string>
                </rect>
               </property>
               <property name="cursor" stdset="0">
-               <cursorShape>ForbiddenCursor</cursorShape>
+               <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="layoutDirection">
                <enum>Qt::LeftToRight</enum>
@@ -698,8 +698,11 @@ background-position: center left;</string>
               <property name="editTriggers">
                <set>QAbstractItemView::NoEditTriggers</set>
               </property>
+              <property name="alternatingRowColors">
+               <bool>false</bool>
+              </property>
               <property name="selectionMode">
-               <enum>QAbstractItemView::SingleSelection</enum>
+               <enum>QAbstractItemView::NoSelection</enum>
               </property>
               <column>
                <property name="text">
