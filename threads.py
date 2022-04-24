@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from database_operations import load_workers, add_worker, update_worker, delete_worker, load_garde_month, \
-    add_garde_month, check_month
+    add_garde_month, check_month, delete_garde_month
 
 
 class ThreadLoadingApp(QThread):
@@ -201,4 +201,28 @@ class ThreadAddGardeMonth(QThread):
                 self._signal.emit(i)
 
             self._signal_result.emit(False)
+
+
+class ThreadDeleteGardeMonth(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, id):
+        super(ThreadDeleteGardeMonth, self).__init__()
+        self.id = id
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        for i in range(30):
+            self._signal.emit(i)
+
+        delete_garde_month(self.id)
+
+        for i in range(30, 99):
+            self._signal.emit(i)
+
+        self._signal_result.emit(True)
 

@@ -8,8 +8,9 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidgetItem, qApp, QCompleter
 
 from custom_widgets import Check
-from dialogs import Threading_loading, Update_worker_dialog
-from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker
+from dialogs import Threading_loading, Update_worker_dialog, Add_new_month
+from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker, ThreadDeleteWorker, ThreadLoadGardeMonth, \
+    ThreadAddGardeMonth, ThreadDeleteGardeMonth
 
 WINDOW_SIZE = 0
 
@@ -274,24 +275,17 @@ class AppUi(QtWidgets.QMainWindow):
             for row in range(self.table_workers.rowCount()):
                 self.table_workers.cellWidget(row, 1).check.setChecked(False)
         else:
-            dialog = Update_worker_dialog()
-            if dialog.exec() == QtWidgets.QDialog.Accepted:
-                if dialog.worker.text() == "":
-                    message = "enter un valide nom"
-                    self.alert_(message)
-                else:
-                    self.dialog = Threading_loading()
-                    self.dialog.ttl.setText("إنتظر من فضلك")
-                    self.dialog.progress.setValue(0)
-                    self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-                    self.dialog.show()
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.dialog.show()
 
-                    self.thr = ThreadUpdateWorker(int(self.table_workers.item(row_selected, 0).text()),
-                                                  dialog.worker.text())
-                    self.thr._signal.connect(self.signal_delete_worker)
-                    self.thr._signal_list.connect(self.signal_delete_worker)
-                    self.thr._signal_result.connect(self.signal_delete_worker)
-                    self.thr.start()
+            self.thr = ThreadDeleteWorker(int(self.table_workers.item(row_selected, 0).text()))
+            self.thr._signal.connect(self.signal_delete_worker)
+            self.thr._signal_list.connect(self.signal_delete_worker)
+            self.thr._signal_result.connect(self.signal_delete_worker)
+            self.thr.start()
 
     def signal_delete_worker(self, progress):
         if type(progress) == int:
@@ -303,11 +297,135 @@ class AppUi(QtWidgets.QMainWindow):
             self.table_workers.setRowCount(0)
             self.load_workers()
 
+
+    def load_garde_month(self):
+        self.dialog = Threading_loading()
+        self.dialog.ttl.setText("إنتظر من فضلك")
+        self.dialog.progress.setValue(0)
+        self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.dialog.show()
+
+        self.thr = ThreadLoadGardeMonth(self.service)
+        self.thr._signal.connect(self.signal_load_garde_month)
+        self.thr._signal_list.connect(self.signal_load_garde_month)
+        self.thr._signal_result.connect(self.signal_load_garde_month)
+        self.thr.start()
+
+    def signal_load_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+            row = progress[0]
+            print(row)
+            month = progress[1]
+            self.table_gardes.insertRow(row)
+            self.table_gardes.setRowHeight(row, 40)
+            check = Check()
+            self.table_gardes.setItem(row, 0, QTableWidgetItem(str(month[0])))
+            self.table_gardes.setCellWidget(row, 1, check)
+            self.table_gardes.setItem(row, 2, QTableWidgetItem(str(month[1])))
+            self.table_gardes.setItem(row, 3, QTableWidgetItem(str(month[2])))
+            self.table_gardes.setItem(row, 4, QTableWidgetItem(str(month[3])))
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+
     def add_planing(self):
-        print("ok")
+        dialog = Add_new_month()
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            if dialog.year.text() == "":
+                message = "Entrer une valid année"
+                self.alert_(message)
+            else:
+                m = 0
+                if dialog.month.currentIndex() == 0:
+                    m = 1
+                elif dialog.month.currentIndex() == 1:
+                    m = 2
+                elif dialog.month.currentIndex() == 2:
+                    m = 3
+                elif dialog.month.currentIndex() == 3:
+                    m = 4
+                elif dialog.month.currentIndex() == 4:
+                    m = 5
+                elif dialog.month.currentIndex() == 5:
+                    m = 6
+                elif dialog.month.currentIndex() == 6:
+                    m = 7
+                elif dialog.month.currentIndex() == 7:
+                    m = 8
+                elif dialog.month.currentIndex() == 8:
+                    m = 9
+                elif dialog.month.currentIndex() == 9:
+                    m = 10
+                elif dialog.month.currentIndex() == 10:
+                    m = 11
+                elif dialog.month.currentIndex() == 11:
+                    m = 12
+
+                self.dialog = Threading_loading()
+                self.dialog.ttl.setText("إنتظر من فضلك")
+                self.dialog.progress.setValue(0)
+                self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                self.dialog.show()
+
+                self.thr = ThreadAddGardeMonth(self.service, m, int(dialog.year.text()))
+                self.thr._signal.connect(self.signal_add_garde_month)
+                self.thr._signal_list.connect(self.signal_add_garde_month)
+                self.thr._signal_result.connect(self.signal_add_garde_month)
+                self.thr.start()
+
+    def signal_add_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            if progress == True:
+                self.dialog.progress.setValue(100)
+                self.dialog.label.setText("complete")
+                self.dialog.close()
+                self.table_gardes.setRowCount(0)
+                self.load_garde_month()
+            else:
+                self.dialog.progress.setValue(100)
+                self.dialog.label.setText("complete")
+                self.dialog.close()
+                message = "le mois est déjà existant"
+                self.alert_(message)
+
 
     def delete_planing(self):
-        print("ok")
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just une travailleur")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.dialog.show()
+
+            self.thr = ThreadDeleteGardeMonth(int(self.table_gardes.item(row_selected, 0).text()))
+            self.thr._signal.connect(self.signal_delete_garde_month)
+            self.thr._signal_list.connect(self.signal_delete_garde_month)
+            self.thr._signal_result.connect(self.signal_delete_garde_month)
+            self.thr.start()
+
+    def signal_delete_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.table_gardes.setRowCount(0)
+            self.load_garde_month()
 
     def garde(self):
         print("ok")
