@@ -138,7 +138,7 @@ class AppUi(QtWidgets.QMainWindow):
             self.ttl1.setText("Liste des infirmiers d'urgences")
             self.ttl2.setText("nom")
             self.statestiques_button.setEnabled(False)
-        elif self.service == "pharmacie":
+        elif self.service == "pharm":
             self.ttl.setText("EPSP Djanet ( Pharmacie )")
             self.ttl1.setText("Liste des pharmaciens")
             self.ttl2.setText("nom")

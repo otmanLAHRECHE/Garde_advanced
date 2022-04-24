@@ -36,18 +36,32 @@ class ChoseService(QtWidgets.QMainWindow):
             self.next_page.show()
             self.close()
         elif self.chose.currentIndex() == 2:
-            print("nothing")
+            self.next_page = app.AppUi("inf")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 3:
-            print("nothing")
+            self.next_page = app.AppUi("dentiste")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 4:
-            print("nothing")
+            self.next_page = app.AppUi("dentiste_inf")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 5:
-            print("nothing")
+            self.next_page = app.AppUi("pharm")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 6:
-            print("nothing")
+            self.next_page = app.AppUi("labo")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 7:
-            print("nothing")
+            self.next_page = app.AppUi("admin")
+            self.next_page.show()
+            self.close()
         elif self.chose.currentIndex() == 8:
-            print("nothing")
+            self.next_page = app.AppUi("radio")
+            self.next_page.show()
+            self.close()
 
 
