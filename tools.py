@@ -306,9 +306,7 @@ def create_garde_inf_page(service, grd_cons, month, year, data, groupes, path):
                     pdf.multi_cell(col_width, line_height, datum, border=1, ln=3, max_line_height=pdf.font_size,
                                    fill=fill)
 
-
         fill = False
-
         pdf.ln(line_height)
 
     for groupe in groupes:
