@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 import app
 from threads import ThreadGuard
-from tools import create_garde_page
+from tools import create_garde_page, create_garde_inf_page
 
 
 class ExportGardeUi(QtWidgets.QMainWindow):
@@ -82,10 +82,14 @@ class ExportGardeUi(QtWidgets.QMainWindow):
             self.ttl.setText("EPSP Djanet ( Infirmiers d'urgences )")
             self.ttl.setText("Imprimer planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
 
+        elif self.service == "surv":
+            self.ttl.setText("EPSP Djanet ( Infirmiers d'urgences )")
+            self.ttl.setText("Imprimer planing de garde infirmiers surveillants mois " + str(m) + "/" + str(self.year) + ":")
+
         elif self.service == "pharm":
             self.ttl.setText("Imprimer planing de garde pharmacie mois " + str(m) + "/" + str(self.year) + ":")
 
-        self.thr = ThreadGuard(self.service ,self.num_days, self.month, self.year)
+        self.thr = ThreadGuard(self.service, self.num_days, self.month, self.year)
         self.thr._signal.connect(self.signal_accept)
         self.thr._signal_result.connect(self.signal_accept)
         self.thr.start()
@@ -100,10 +104,17 @@ class ExportGardeUi(QtWidgets.QMainWindow):
             message = "destination untrouvable"
             self.alert_(message)
         else:
-            create_garde_page("URGENCE", "GARDE MEDECINS GENERALISTE", self.month, self.year, self.data, filePath)
-            self.next_page = app.AppUi(self.service)
-            self.next_page.show()
-            self.close()
+            if not self.service == "inf" and not self.service == "surv":
+                create_garde_page(self.service,  self.month, self.year, self.data, filePath)
+                self.next_page = app.AppUi(self.service)
+                self.next_page.show()
+                self.close()
+            else:
+                create_garde_inf_page(self.service,  self.month, self.year, self.data,
+                                      self.groupes, filePath)
+                self.next_page = app.AppUi(self.service)
+                self.next_page.show()
+                self.close()
 
     def signal_accept(self, progress):
         if type(progress) == int:

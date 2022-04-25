@@ -82,7 +82,6 @@ def create_garde_page(service,  month, year, data, path):
         service = "CHIRURGIE DENTAIRE"
         grd_cons = "GARDE (DENTISTE INFIRMIERS)"
 
-
     elif service == "pharm":
         service = "PHARMACIE"
         grd_cons = "GARDE PHARMACIE"
@@ -237,6 +236,15 @@ def create_garde_inf_page(service, grd_cons, month, year, data, groupes, path):
     pdf = EpspPdf()
     pdf.alias_nb_pages()
     pdf.add_page()
+
+    if service == "inf":
+        service = "URGENCE"
+        grd_cons = "GARDE (GROUPES DES INFIRMIERS)"
+    elif service == "surv":
+        service = "URGENCE"
+        grd_cons = "GARDE INFIRMIERS SURVEILLANTS"
+
+
     pdf.set_font("helvetica", size=12)
     pdf.cell(0, 10, "Service de: "+service, 0, 0, markdown=True)
     pdf.ln(10)
