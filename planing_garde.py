@@ -35,6 +35,13 @@ class GuardUi(QtWidgets.QMainWindow):
         self.table.setColumnWidth(2, 220)
         self.table.setColumnWidth(3, 220)
 
+        if self.service == "inf" or self.service == "radio" or self.service == "labo" or self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+            data = ["Jours", "Date", "De 08h:00 à 16h:00", "De 16h:00 à 08h:00"]
+        else:
+            data = ["Jours", "Date", "De 08h:00 à 20h:00", "De 20h:00 à 08h:00"]
+
+        self.table.setHorizontalHeader(data)
+
         self.month = month
         self.year = year
         self.service = service

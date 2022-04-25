@@ -376,7 +376,6 @@ class AppUi(QtWidgets.QMainWindow):
 
                 self.thr = ThreadAddGardeMonth(self.service, m, int(dialog.year.text()))
                 self.thr._signal.connect(self.signal_add_garde_month)
-                self.thr._signal_list.connect(self.signal_add_garde_month)
                 self.thr._signal_result.connect(self.signal_add_garde_month)
                 self.thr.start()
 
@@ -386,13 +385,13 @@ class AppUi(QtWidgets.QMainWindow):
         else:
             if progress == True:
                 self.dialog.progress.setValue(100)
-                self.dialog.label.setText("complete")
+                self.dialog.ttl.setText("complete")
                 self.dialog.close()
                 self.table_gardes.setRowCount(0)
                 self.load_garde_month()
             else:
                 self.dialog.progress.setValue(100)
-                self.dialog.label.setText("complete")
+                self.dialog.ttl.setText("complete")
                 self.dialog.close()
                 message = "le mois est déjà existant"
                 self.alert_(message)

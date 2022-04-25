@@ -310,7 +310,7 @@
      <string notr="true">background-color: rgb(199, 238, 255);</string>
     </property>
     <property name="text">
-     <string>Export</string>
+     <string>Imprimer</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">

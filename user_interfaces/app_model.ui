@@ -826,7 +826,7 @@ background-position: center left;</string>
                </rect>
               </property>
               <property name="cursor" stdset="0">
-               <cursorShape>ForbiddenCursor</cursorShape>
+               <cursorShape>PointingHandCursor</cursorShape>
               </property>
               <property name="layoutDirection">
                <enum>Qt::LeftToRight</enum>
