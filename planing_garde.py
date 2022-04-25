@@ -13,7 +13,7 @@ from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 
 import os
 
-from threads import Thread_load_guards, Thread_create_guard
+from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard
 from widgets import Chose_worker
 
 
@@ -253,8 +253,6 @@ class GuardUi(QtWidgets.QMainWindow):
             self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
             self.dialog.show()
 
-
-
             self.thr3 = ThreadAutoGuard(self.num_days, self.month, self.year, self.service, self.table, auto)
             self.thr3._signal.connect(self.signal_accepted_auto)
             self.thr3._signal_status.connect(self.signal_accepted_auto)
@@ -276,10 +274,24 @@ class GuardUi(QtWidgets.QMainWindow):
             chose_light = Chose_worker(self.medcins)
             chose_night = Chose_worker(self.medcins)
 
-            chose_light.chose.setCurrentIndex(progress[1])
-            chose_night.chose.setCurrentIndex(progress[2])
-            self.table.setCellWidget(progress[0], 2, chose_light)
-            self.table.setCellWidget(progress[0], 3, chose_night)
+            if self.table.item(progress[0], 0).text() == "Dimanche" or self.table.item(progress[0],
+                                                                                       0).text() == "Lundi" or self.table.item(
+                    progress[0], 0).text() == "Mardi" or self.table.item(progress[0],
+                                                                         0).text() == "Mercredi" or self.table.item(
+                    progress[0], 0).text() == "Jeudi":
+                if self.service == "inf" or  self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+                    chose_night.chose.setCurrentIndex(progress[2])
+                    self.table.setCellWidget(progress[0], 3, chose_night)
+                else:
+                    chose_light.chose.setCurrentIndex(progress[1])
+                    chose_night.chose.setCurrentIndex(progress[2])
+                    self.table.setCellWidget(progress[0], 2, chose_light)
+                    self.table.setCjellWidget(progress[0], 3, chose_night)
+            else:
+                chose_light.chose.setCurrentIndex(progress[1])
+                chose_night.chose.setCurrentIndex(progress[2])
+                self.table.setCellWidget(progress[0], 2, chose_light)
+                self.table.setCellWidget(progress[0], 3, chose_night)
         else:
             self.dialog.progress.setValue(100)
             self.dialog.label.setText("complete")
