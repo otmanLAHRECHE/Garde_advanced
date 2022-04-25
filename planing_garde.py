@@ -159,7 +159,7 @@ class GuardUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(progress)
         elif type(progress) == bool:
             self.dialog.progress.setValue(100)
-            self.dialog.label.setText("complete")
+            self.dialog.ttl.setText("complete")
             self.dialog.close()
 
     def signal_accepted_load(self, progress):
@@ -278,7 +278,7 @@ class GuardUi(QtWidgets.QMainWindow):
                     progress[0], 0).text() == "Mardi" or self.table.item(progress[0],
                                                                          0).text() == "Mercredi" or self.table.item(
                     progress[0], 0).text() == "Jeudi":
-                if self.service == "inf" or  self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+                if self.service == "inf" or self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
                     chose_night.chose.setCurrentIndex(progress[2])
                     self.table.setCellWidget(progress[0], 3, chose_night)
                 else:
