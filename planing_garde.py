@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTableWidgetItem, qApp, QMessageBox
 
 import app
+import export_garde
 from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 
 import os
@@ -208,12 +209,10 @@ class GuardUi(QtWidgets.QMainWindow):
                     chose_night.chose.setCurrentText(str(rn[0]))
             else:
                 if results_light:
-                    print(results_light)
                     rl = results_light[0]
                     chose_light.chose.setCurrentText(str(rl[0]))
                 if results_night:
                     print(results_night)
-                    rn = results_night[0]
                     chose_night.chose.setCurrentText(str(rn[0]))
 
 
@@ -221,6 +220,67 @@ class GuardUi(QtWidgets.QMainWindow):
             self.table.setCellWidget(row, 3, chose_night)
 
         elif type(progress) == bool:
+            self.dialog.progress.setValue(100)
+            self.dialog.label.setText("complete")
+            self.dialog.close()
+
+    def export(self):
+        self.want_to_close = True
+        self.next_page = export_garde.ExportGardeUi(self.service, self.month, self.year)
+        self.close()
+        self.next_page.show()
+
+    def auto_(self):
+        auto = []
+        for i in range(16):
+            check1 = self.table.cellWidget(i, 2)
+            check2 = self.table.cellWidget(i, 3)
+            medInd1 = check1.chose.currentIndex()
+            medInd2 = check2.chose.currentIndex()
+            if medInd1 != 0:
+                auto.append(medInd1)
+            if medInd2 != 0:
+                auto.append(medInd2)
+
+
+        if len(auto) == 0:
+            message = "liste vide"
+            self.alert_(message)
+        else:
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.dialog.show()
+
+
+
+            self.thr3 = ThreadAutoGuard(self.num_days, self.month, self.year, self.service, self.table, auto)
+            self.thr3._signal.connect(self.signal_accepted_auto)
+            self.thr3._signal_status.connect(self.signal_accepted_auto)
+            self.thr3._signal_result.connect(self.signal_accepted_auto)
+            self.thr3.start()
+
+
+    def alert_(self, message):
+        alert = QMessageBox()
+        alert.setWindowTitle("alert")
+        alert.setText(message)
+        alert.exec_()
+
+
+    def signal_accepted_auto(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+            chose_light = Chose_worker(self.medcins)
+            chose_night = Chose_worker(self.medcins)
+
+            chose_light.chose.setCurrentIndex(progress[1])
+            chose_night.chose.setCurrentIndex(progress[2])
+            self.table.setCellWidget(progress[0], 2, chose_light)
+            self.table.setCellWidget(progress[0], 3, chose_night)
+        else:
             self.dialog.progress.setValue(100)
             self.dialog.label.setText("complete")
             self.dialog.close()

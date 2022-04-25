@@ -467,3 +467,137 @@ class Thread_load_guards(QThread):
         connection.close()
         self._signal_finish.emit(True)
 
+
+class ThreadAutoGuard(QThread):
+    _signal = pyqtSignal(list)
+    _signal_status = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year, service, table, auto):
+        super(ThreadAutoGuard, self).__init__()
+        self.month = month
+        self.year = year
+        self.service = service
+        self.table = table
+        self.num_days = num_days
+        self.auto = auto
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        index_max = len(self.auto)
+        index_max = index_max - 1
+        index = 0
+
+        for row in range(self.num_days):
+            day = row + 1
+            prog = row * 100 / self.num_days
+
+            x = datetime.datetime(self.year, self.month, day)
+
+
+            if x.strftime("%A") == "Saturday":
+                results_light = self.auto[index]
+                if index == index_max:
+                    results_night = self.auto[0]
+                    index = 0
+                else:
+                    results_night = self.auto[index + 1]
+                    index = index + 1
+
+            elif x.strftime("%A") == "Sunday":
+                if self.service == "urgence" or self.service == "radio" or self.service == "surv" or self.service == "inf" or self.service == "labo":
+
+                    results_light = self.auto[index]
+                    if index == index_max:
+                        results_night = self.auto[0]
+                        index = 0
+                    else:
+
+                        results_night = self.auto[index + 1]
+                        index = index + 1
+                else:
+                    results_light = " "
+                    results_night = self.auto[index]
+
+            elif x.strftime("%A") == "Monday":
+                if self.service == "urgence" or self.service == "radio" or self.service == "surv" or self.service == "inf" or self.service == "labo":
+
+                    results_light = self.auto[index]
+                    if index == index_max:
+                        results_night = self.auto[0]
+                        index = 0
+                    else:
+
+                        results_night = self.auto[index + 1]
+                        index = index + 1
+                else:
+                    results_light = " "
+                    results_night = self.auto[index]
+            elif x.strftime("%A") == "Tuesday":
+                if self.service == "urgence" or self.service == "radio" or self.service == "surv" or self.service == "inf" or self.service == "labo":
+
+                    results_light = self.auto[index]
+                    if index == index_max:
+                        results_night = self.auto[0]
+                        index = 0
+                    else:
+
+                        results_night = self.auto[index + 1]
+                        index = index + 1
+                else:
+                    results_light = " "
+                    results_night = self.auto[index]
+            elif x.strftime("%A") == "Wednesday":
+                if self.service == "urgence" or self.service == "radio" or self.service == "surv" or self.service == "inf" or self.service == "labo":
+
+                    results_light = self.auto[index]
+                    if index == index_max:
+                        results_night = self.auto[0]
+                        index = 0
+                    else:
+
+                        results_night = self.auto[index + 1]
+                        index = index + 1
+                else:
+                    results_light = " "
+                    results_night = self.auto[index]
+            elif x.strftime("%A") == "Thursday":
+                if self.service == "urgence" or self.service == "radio" or self.service == "surv" or self.service == "inf" or self.service == "labo":
+
+                    results_light = self.auto[index]
+                    if index == index_max:
+                        results_night = self.auto[0]
+                        index = 0
+                    else:
+
+                        results_night = self.auto[index + 1]
+                        index = index + 1
+                else:
+                    results_light = " "
+                    results_night = self.auto[index]
+            elif x.strftime("%A") == "Friday":
+                results_light = self.auto[index]
+                if index == index_max:
+                    results_night = self.auto[0]
+                    index = 0
+                else:
+                    results_night = self.auto[index + 1]
+                    index = index + 1
+
+            if index == index_max:
+                index = 0
+            else:
+                index = index + 1
+            list = []
+            list.append(row)
+            list.append(results_light)
+            list.append(results_night)
+
+            self._signal.emit(list)
+            self._signal_status.emit(int(prog))
+
+        self._signal_result.emit(True)
+
