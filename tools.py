@@ -56,10 +56,37 @@ def get_consultation_months_count(service):
     return results
 
 
-def create_garde_page(service, grd_cons, month, year, data, path):
+def create_garde_page(service,  month, year, data, path):
     pdf = EpspPdf()
     pdf.alias_nb_pages()
     pdf.add_page()
+    if service == "urgence":
+        service = "URGENCE"
+        grd_cons = "GARDE MEDECINS GENERALISTE"
+    elif service == "dentiste":
+        service = "CHIRURGIE DENTAIRE"
+        grd_cons = "GARDE DES MEDECINS DENTISTES"
+    elif service == "labo":
+        service = "LABORATOIRE"
+        grd_cons = "GARDE LABORATOIRE"
+
+    elif service == "radio":
+        service = "RADIOLOGIE"
+        grd_cons = "GARDE RADIOLOGIE"
+
+    elif service == "admin":
+        service = "ADMINISTRATION"
+        grd_cons = "GARDE ADMINISTRATIVE"
+
+    elif service == "dentiste_inf":
+        service = "CHIRURGIE DENTAIRE"
+        grd_cons = "GARDE (DENTISTE INFIRMIERS)"
+
+
+    elif service == "pharm":
+        service = "PHARMACIE"
+        grd_cons = "GARDE PHARMACIE"
+
     pdf.set_font("helvetica", size=12)
     pdf.cell(0, 10, "Service de: "+service, 0, 0, markdown=True)
     pdf.ln(10)
