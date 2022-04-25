@@ -25,6 +25,7 @@ class GuardUi(QtWidgets.QMainWindow):
         self.want_to_close = False
         self.days_of_week = "Dimanche" + "  " + "Lundi" + "  " + "Mardi" + "  " + "Mercredi" + "  " + "Jeudi"
 
+        self.service = service
         self.ttl = self.findChild(QtWidgets.QLabel, "label")
         self.table = self.findChild(QtWidgets.QTableWidget, "tableWidget")
         self.save = self.findChild(QtWidgets.QPushButton, "pushButton")
@@ -41,11 +42,10 @@ class GuardUi(QtWidgets.QMainWindow):
         else:
             data = ["Jours", "Date", "De 08h:00 à 20h:00", "De 20h:00 à 08h:00"]
 
-        self.table.setHorizontalHeader(data)
+        self.table.setHorizontalHeaderLabels(data)
 
         self.month = month
         self.year = year
-        self.service = service
         self.num_days = monthrange(self.year, self.month)[1]
 
         if self.month == 1:
@@ -146,14 +146,12 @@ class GuardUi(QtWidgets.QMainWindow):
         dialog = CustomDialog(message)
         if not self.want_to_close:
             if dialog.exec():
-                self.next_page = app.AppUi()
+                self.next_page = app.AppUi(self.service)
                 self.next_page.show()
                 self.close()
             else:
                 a0.ignore()
         else:
-            self.next_page = app.AppUi()
-            self.next_page.show()
             self.close()
 
     def signal_accepted(self, progress):
@@ -212,6 +210,7 @@ class GuardUi(QtWidgets.QMainWindow):
                     rl = results_light[0]
                     chose_light.chose.setCurrentText(str(rl[0]))
                 if results_night:
+                    rn = results_night[0]
                     print(results_night)
                     chose_night.chose.setCurrentText(str(rn[0]))
 
@@ -221,7 +220,7 @@ class GuardUi(QtWidgets.QMainWindow):
 
         elif type(progress) == bool:
             self.dialog.progress.setValue(100)
-            self.dialog.label.setText("complete")
+            self.dialog.ttl.setText("complete")
             self.dialog.close()
 
     def export(self):
@@ -286,7 +285,7 @@ class GuardUi(QtWidgets.QMainWindow):
                     chose_light.chose.setCurrentIndex(progress[1])
                     chose_night.chose.setCurrentIndex(progress[2])
                     self.table.setCellWidget(progress[0], 2, chose_light)
-                    self.table.setCjellWidget(progress[0], 3, chose_night)
+                    self.table.setCellWidget(progress[0], 3, chose_night)
             else:
                 chose_light.chose.setCurrentIndex(progress[1])
                 chose_night.chose.setCurrentIndex(progress[2])
@@ -294,5 +293,5 @@ class GuardUi(QtWidgets.QMainWindow):
                 self.table.setCellWidget(progress[0], 3, chose_night)
         else:
             self.dialog.progress.setValue(100)
-            self.dialog.label.setText("complete")
+            self.dialog.ttl.setText("complete")
             self.dialog.close()

@@ -7,6 +7,7 @@ from PyQt5.QtCore import QSize, QPropertyAnimation, QDate
 from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidgetItem, qApp, QCompleter
 
+import planing_garde
 from custom_widgets import Check
 from dialogs import Threading_loading, Update_worker_dialog, Add_new_month
 from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker, ThreadDeleteWorker, ThreadLoadGardeMonth, \
@@ -92,11 +93,12 @@ class AppUi(QtWidgets.QMainWindow):
         self.table_gardes.hideColumn(0)
         self.table_gardes.setColumnWidth(1, 40)
         self.table_workers.setColumnWidth(1, 40)
-        self.table_workers.setColumnWidth(2, 200)
+        self.table_workers.setColumnWidth(2, 280)
+        self.table_workers.setColumnWidth(3, 130)
 
         self.table_gardes.setColumnWidth(2, 200)
         self.table_gardes.setColumnWidth(3, 200)
-        self.table_gardes.setColumnWidth(4, 300)
+        self.table_gardes.setColumnWidth(4, 330)
 
         self.worker_name = self.findChild(QtWidgets.QLineEdit, "lineEdit_2")
 
@@ -327,7 +329,32 @@ class AppUi(QtWidgets.QMainWindow):
             check = Check()
             self.table_gardes.setItem(row, 0, QTableWidgetItem(str(month[0])))
             self.table_gardes.setCellWidget(row, 1, check)
-            self.table_gardes.setItem(row, 2, QTableWidgetItem(str(month[1])))
+            m = ""
+            if month[1] == 1:
+                m = "janvier"
+            elif month[1] == 2:
+                m = "février"
+            elif month[1] == 3:
+                m = "mars"
+            elif month[1] == 4:
+                m = "avril"
+            elif month[1] == 5:
+                m = "mai"
+            elif month[1] == 6:
+                m = "juin"
+            elif month[1] == 7:
+                m = "juillet"
+            elif month[1] == 8:
+                m = "août"
+            elif month[1] == 9:
+                m = "septembre"
+            elif month[1] == 10:
+                m = "octobre"
+            elif month[1] == 11:
+                m = "novembre"
+            elif month[1] == 12:
+                m = "décembre"
+            self.table_gardes.setItem(row, 2, QTableWidgetItem(str(m)))
             self.table_gardes.setItem(row, 3, QTableWidgetItem(str(month[2])))
             self.table_gardes.setItem(row, 4, QTableWidgetItem(str(month[3])))
         else:
@@ -404,7 +431,7 @@ class AppUi(QtWidgets.QMainWindow):
                 row_selected = row
                 ch = ch + 1
         if ch > 1 or ch == 0:
-            self.alert_("selectioner just une travailleur")
+            self.alert_("selectioner just un mois")
             for row in range(self.table_workers.rowCount()):
                 self.table_workers.cellWidget(row, 1).check.setChecked(False)
         else:
@@ -431,7 +458,48 @@ class AppUi(QtWidgets.QMainWindow):
             self.load_garde_month()
 
     def garde(self):
-        print("ok")
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            m = self.table_gardes.item(row_selected, 2).text()
+            y = self.table_gardes.item(row_selected, 3).text()
+            if m == "janvier":
+                m = 1
+            elif m == "février":
+                m = 2
+            elif m == "mars":
+                m = 3
+            elif m == "avril":
+                m = 4
+            elif m == "mai":
+                m = 5
+            elif m == "juin":
+                m = 6
+            elif m == "juillet":
+                m = 7
+            elif m == "août":
+                m = 8
+            elif m == "septembre":
+                m = 9
+            elif m == "octobre":
+                m = 10
+            elif m == "novembre":
+                m = 11
+            elif m == "décembre":
+                m = 12
+
+            y = int(y)
+
+            self.next_page = planing_garde.GuardUi(self.service, m, y)
+            self.next_page.show()
+            self.close()
 
     def recap(self):
         print("ok")
