@@ -194,13 +194,17 @@ class GuardUi(QtWidgets.QMainWindow):
             chose_light = Chose_worker(self.medcins)
             chose_night = Chose_worker(self.medcins)
 
-            if self.service == "inf" or  self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+            if self.service == "inf" or  self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf" or self.service == "dentiste":
                 if m in self.days_of_week:
                     if results_light:
                         rl = results_light[0]
                         chose_light.chose.setCurrentText(str(rl[0]))
                     else:
                         chose_light.chose.setEnabled(False)
+                else:
+                    if results_light:
+                        rl = results_light[0]
+                        chose_light.chose.setCurrentText(str(rl[0]))
 
                 if results_night:
                     rn = results_night[0]

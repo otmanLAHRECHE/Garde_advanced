@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+import time
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -294,11 +295,11 @@ class ThreadGuard(QThread):
                     date_day = str(0) + str(day) + "/" + str(0) + str(self.month) + "/" + str(self.year)
 
             sql_q = 'SELECT health_worker.full_name FROM health_worker INNER JOIN guard ON health_worker.worker_id = guard.gardien_id where service=? and guard.periode =? and guard.d =? and guard.m =? and guard.y =?'
-            cur.execute(sql_q, ('urgence_surv', 'light', day, self.month, self.year))
+            cur.execute(sql_q, (self.service, 'light', day, self.month, self.year))
             results_light = cur.fetchall()
 
             sql_q = 'SELECT health_worker.full_name FROM health_worker INNER JOIN guard ON health_worker.worker_id = guard.gardien_id where service=? and guard.periode =? and guard.d =? and guard.m =? and guard.y =?'
-            cur.execute(sql_q, ('urgence_surv', 'night', day, self.month, self.year))
+            cur.execute(sql_q, (self.service, 'night', day, self.month, self.year))
             results_night = cur.fetchall()
 
 
@@ -314,6 +315,7 @@ class ThreadGuard(QThread):
 
             self.data.append(data_day)
             self._signal.emit(int(prog))
+            time.sleep(0.1)
 
         connection.close()
         self._signal_result.emit(self.data)
@@ -463,6 +465,7 @@ class Thread_load_guards(QThread):
 
             self._signal.emit(list)
             self._signal_status.emit(int(prog))
+            time.sleep(0.1)
 
         connection.close()
         self._signal_finish.emit(True)
@@ -597,6 +600,7 @@ class ThreadAutoGuard(QThread):
             list.append(results_night)
 
             self._signal.emit(list)
+            time.sleep(0.1)
             self._signal_status.emit(int(prog))
 
         self._signal_result.emit(True)
