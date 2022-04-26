@@ -1,5 +1,9 @@
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QFileDialog
 
+import app
+from dialogs import CustomDialog
 from threads import ThreadRecapExport
 from tools import create_recap_page
 
@@ -23,6 +27,10 @@ class ExportRecapUi(QtWidgets.QMainWindow):
         self.status = self.findChild(QtWidgets.QLabel, "label_2")
         self.export = self.findChild(QtWidgets.QPushButton, "pushButton")
         self.export.setEnabled(False)
+        self.export.setIcon(QIcon("./asstes/images/download2.png"))
+        self.preview = self.findChild(QtWidgets.QPushButton, "pushButton_2")
+        self.preview.setEnabled(False)
+        self.preview.setIcon(QIcon("./asstes/images/eye.png"))
         self.export.clicked.connect(self.export_pdf)
         self.status.setText("Preparation des données")
 
@@ -116,9 +124,21 @@ class ExportRecapUi(QtWidgets.QMainWindow):
             create_recap_page(s, r, self.month, self.year, self.data, self.chef, filePath)
 
 
-
+            self.next_page = app.AppUi(self.service)
             self.next_page.show()
             self.close()
+
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        message = "Es-tu sûr de quiter"
+        dialog = CustomDialog(message)
+
+        if dialog.exec():
+            self.next_page = app.AppUi(self.service)
+            self.next_page.show()
+            self.close()
+        else:
+            a0.ignore()
 
 
     def signal_accept(self, progress):
