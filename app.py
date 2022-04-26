@@ -170,6 +170,7 @@ class AppUi(QtWidgets.QMainWindow):
             self.statestiques_button.setEnabled(False)
 
 
+
         self.load_workers()
 
 

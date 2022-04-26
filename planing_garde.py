@@ -93,7 +93,6 @@ class GuardUi(QtWidgets.QMainWindow):
             self.ttl.setText("Planing de garde infirmiers dentaire mois " + str(m) + "/" + str(self.year) + ":")
 
         elif self.service == "inf":
-            self.ttl.setText("EPSP Djanet ( Infirmiers d'urgences )")
             self.ttl.setText("Planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
 
         elif self.service == "pharm":
