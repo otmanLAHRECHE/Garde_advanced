@@ -108,8 +108,8 @@ class ExportRecapUi(QtWidgets.QMainWindow):
                 s = "PHARMACIE"
                 r = "pharmaciens"
             elif self.service == "admin":
-                s = "PHARMACIE"
-                r = "pharmaciens"
+                s = "ADMINISTRATION"
+                r = "administration"
 
 
 
