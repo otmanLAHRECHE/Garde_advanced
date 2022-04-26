@@ -10,7 +10,7 @@ from threads import Thread_save_recap, Thread_recap_load
 
 
 class RecapUi(QtWidgets.QMainWindow):
-    def __init__(self, service,month, year):
+    def __init__(self, service, month, year):
         super(RecapUi, self).__init__()
         uic.loadUi("./user_interfaces/recap.ui", self)
 

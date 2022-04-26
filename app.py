@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidgetItem, qApp, QCompleter
 
 import planing_garde
+import recap
 from custom_widgets import Check
 from dialogs import Threading_loading, Update_worker_dialog, Add_new_month
 from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker, ThreadDeleteWorker, ThreadLoadGardeMonth, \
@@ -85,6 +86,7 @@ class AppUi(QtWidgets.QMainWindow):
         self.ttl = self.findChild(QtWidgets.QLabel, "label_2")
         self.ttl1 = self.findChild(QtWidgets.QLabel, "label")
         self.ttl2 = self.findChild(QtWidgets.QLabel, "label_3")
+        self.ttl3 = self.findChild(QtWidgets.QLabel, "label_12")
 
         self.table_workers = self.findChild(QtWidgets.QTableWidget, "tableWidget_4")
         self.table_gardes = self.findChild(QtWidgets.QTableWidget, "tableWidget_5")
@@ -142,31 +144,31 @@ class AppUi(QtWidgets.QMainWindow):
             self.ttl.setText("EPSP Djanet ( Laboratoire )")
             self.ttl1.setText("Liste des laborants")
             self.ttl2.setText("nom")
+            self.ttl3.setText("Ajouter un laborants:")
             self.statestiques_button.setEnabled(False)
         elif self.service == "radio":
             self.ttl.setText("EPSP Djanet ( Radiologie )")
             self.ttl1.setText("Liste des manipulateurs radio")
             self.ttl2.setText("nom")
+            self.ttl3.setText("Ajouter un radio manipulateur:")
             self.statestiques_button.setEnabled(True)
         elif self.service == "admin":
             self.ttl.setText("EPSP Djanet ( Administration )")
             self.ttl1.setText("Liste des agents d'administration")
             self.ttl2.setText("nom")
+            self.ttl3.setText("Ajouter un travailleur:")
             self.statestiques_button.setEnabled(False)
         elif self.service == "dentiste_inf":
             self.ttl.setText("EPSP Djanet ( Infirmiers dentaire )")
             self.ttl1.setText("Liste des infirmiers dentaire")
             self.ttl2.setText("nom")
-            self.statestiques_button.setEnabled(False)
-        elif self.service == "inf":
-            self.ttl.setText("EPSP Djanet ( Infirmiers d'urgences )")
-            self.ttl1.setText("Liste des infirmiers d'urgences")
-            self.ttl2.setText("nom")
+            self.ttl3.setText("Ajouter un infirmier:")
             self.statestiques_button.setEnabled(False)
         elif self.service == "pharm":
             self.ttl.setText("EPSP Djanet ( Pharmacie )")
             self.ttl1.setText("Liste des pharmaciens")
             self.ttl2.setText("nom")
+            self.ttl3.setText("Ajouter un pharmacien:")
             self.statestiques_button.setEnabled(False)
 
 
@@ -503,7 +505,48 @@ class AppUi(QtWidgets.QMainWindow):
             self.close()
 
     def recap(self):
-        print("ok")
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            m = self.table_gardes.item(row_selected, 2).text()
+            y = self.table_gardes.item(row_selected, 3).text()
+            if m == "janvier":
+                m = 1
+            elif m == "février":
+                m = 2
+            elif m == "mars":
+                m = 3
+            elif m == "avril":
+                m = 4
+            elif m == "mai":
+                m = 5
+            elif m == "juin":
+                m = 6
+            elif m == "juillet":
+                m = 7
+            elif m == "août":
+                m = 8
+            elif m == "septembre":
+                m = 9
+            elif m == "octobre":
+                m = 10
+            elif m == "novembre":
+                m = 11
+            elif m == "décembre":
+                m = 12
+
+            y = int(y)
+
+            self.next_page = recap.RecapUi(self.service, m, y)
+            self.next_page.show()
+            self.close()
 
     def statestiques(self):
         print("ok")
