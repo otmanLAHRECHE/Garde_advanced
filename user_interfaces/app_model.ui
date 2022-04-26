@@ -522,7 +522,7 @@ background-position: center left;</string>
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="home">
              <widget class="QLabel" name="label">
@@ -661,7 +661,7 @@ background-position: center left;</string>
                <rect>
                 <x>570</x>
                 <y>60</y>
-                <width>171</width>
+                <width>321</width>
                 <height>20</height>
                </rect>
               </property>

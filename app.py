@@ -171,8 +171,6 @@ class AppUi(QtWidgets.QMainWindow):
             self.ttl3.setText("Ajouter un pharmacien:")
             self.statestiques_button.setEnabled(False)
 
-
-
         self.load_workers()
 
 
