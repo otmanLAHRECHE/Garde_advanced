@@ -465,7 +465,6 @@ class Thread_load_guards(QThread):
 
             self._signal.emit(list)
             self._signal_status.emit(int(prog))
-            time.sleep(0.1)
 
         connection.close()
         self._signal_finish.emit(True)

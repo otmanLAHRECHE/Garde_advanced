@@ -136,7 +136,11 @@ def create_garde_page(service,  month, year, data, path):
                 pdf.set_font("Times", "B", size=10)
                 pdf.multi_cell(col_width, line_height, datum, border=1, ln=3, max_line_height=pdf.font_size)
             else:
-                if(datum == " "):
+                if service == "CHIRURGIE DENTAIRE":
+                    if datum == "Dr/ ":
+                        datum = " "
+
+                if datum == " ":
                     pdf.set_fill_color(215, 215, 215)
                     pdf.set_font("Times", size=10)
                     pdf.multi_cell(col_width, line_height, datum, border=1, ln=3, max_line_height=pdf.font_size,
