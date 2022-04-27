@@ -832,3 +832,480 @@ class ThreadRecapExport(QThread):
         print(self.data)
         self._signal_result.emit(self.data)
 
+
+class Thread_state_load(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self, month, year):
+        super(Thread_state_load, self).__init__()
+        self.month = month
+        self.year = year
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_homme where state_homme.m =? and state_homme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_h = cur.fetchall()
+        print("test")
+        print(res_h)
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_famme where state_famme.m =? and state_famme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_f = cur.fetchall()
+
+        print(res_f)
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_enfant where state_enfant.m =? and state_enfant.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_e = cur.fetchall()
+
+        print(res_e)
+
+        self.Poumon = []
+        self.OS = []
+        self.Abdomen_simple = []
+        self.UIV = []
+        self.Cholecystographie = []
+        self.Estomac = []
+        self.Echographie = []
+        self.Fibroscopie = []
+        self.ECG = []
+
+        if res_h:
+            res_h = res_h[0]
+            po = res_h[0]
+            self.Poumon.append(po)
+            os = res_h[1]
+            self.OS.append(os)
+            abd = res_h[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_h[3]
+            self.UIV.append(uiv)
+            chol = res_h[4]
+            self.Cholecystographie.append(chol)
+            est = res_h[5]
+            self.Estomac.append(est)
+            echo = res_h[6]
+            self.Echographie.append(echo)
+            fibr = res_h[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_h[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        if res_f:
+            res_f = res_f[0]
+            po = res_f[0]
+            self.Poumon.append(po)
+            os = res_f[1]
+            self.OS.append(os)
+            abd = res_f[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_f[3]
+            self.UIV.append(uiv)
+            chol = res_f[4]
+            self.Cholecystographie.append(chol)
+            est = res_f[5]
+            self.Estomac.append(est)
+            echo = res_f[6]
+            self.Echographie.append(echo)
+            fibr = res_f[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_f[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        if res_e:
+            res_e = res_e[0]
+            po = res_e[0]
+            self.Poumon.append(po)
+            os = res_e[1]
+            self.OS.append(os)
+            abd = res_e[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_e[3]
+            self.UIV.append(uiv)
+            chol = res_e[4]
+            self.Cholecystographie.append(chol)
+            est = res_e[5]
+            self.Estomac.append(est)
+            echo = res_e[6]
+            self.Echographie.append(echo)
+            fibr = res_e[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_e[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        list = []
+        list.append(self.Poumon)
+        list.append(self.OS)
+        list.append(self.Abdomen_simple)
+        list.append(self.UIV)
+        list.append(self.Cholecystographie)
+        list.append(self.Estomac)
+        list.append(self.Echographie)
+        list.append(self.Fibroscopie)
+        list.append(self.ECG)
+
+        for prog in range(20):
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        print(list)
+        self._signal.emit(list)
+
+        connection.close()
+        self._signal_finish.emit(True)
+
+
+class Thread_save_state(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(bool)
+
+    def __init__(self, month, year, table):
+        super(Thread_save_state, self).__init__()
+        self.month = month
+        self.year = year
+        self.table = table
+
+        self.Poumon = []
+        self.OS = []
+        self.Abdomen_simple = []
+        self.UIV = []
+        self.Cholecystographie = []
+        self.Estomac = []
+        self.Echographie = []
+        self.Fibroscopie = []
+        self.ECG = []
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        for c in range(3):
+            self.Poumon.append(int(self.table.item(0, c).text()))
+            self.OS.append(int(self.table.item(1, c).text()))
+            self.Abdomen_simple.append(int(self.table.item(2, c).text()))
+            self.UIV.append(int(self.table.item(3, c).text()))
+            self.Cholecystographie.append(int(self.table.item(4, c).text()))
+            self.Estomac.append(int(self.table.item(5, c).text()))
+            self.Echographie.append(int(self.table.item(6, c).text()))
+            self.Fibroscopie.append(int(self.table.item(7, c).text()))
+            self.ECG.append(int(self.table.item(8, c).text()))
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_homme where state_homme.m =? and state_homme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_h = cur.fetchall()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_famme where state_famme.m =? and state_famme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_f = cur.fetchall()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_enfant where state_enfant.m =? and state_enfant.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_e = cur.fetchall()
+
+        if res_h:
+            sql_q = 'UPDATE state_homme set Poumon =?,OS=?,Abdomen_simple=?,UIV=?,Cholecystographie=?,Estomac=?,Echographie=?,Fibroscopie=?,ECG=? where state_homme.m=? and state_homme.y=?'
+            cur.execute(sql_q, (
+                self.Poumon[0], self.OS[0], self.Abdomen_simple[0], self.UIV[0], self.Cholecystographie[0],
+                self.Estomac[0],
+                self.Echographie[0], self.Fibroscopie[0], self.ECG[0], self.month, self.year))
+            connection.commit()
+        else:
+            sql_q = 'INSERT INTO state_homme (m,y,Poumon,OS,Abdomen_simple,UIV,Cholecystographie,Estomac,Echographie,Fibroscopie,ECG) values (?,?,?,?,?,?,?,?,?,?,?)'
+            cur.execute(sql_q, (self.month, self.year, self.Poumon[0], self.OS[0], self.Abdomen_simple[0], self.UIV[0],
+                                self.Cholecystographie[0], self.Estomac[0], self.Echographie[0], self.Fibroscopie[0],
+                                self.ECG[0]))
+            connection.commit()
+
+        if res_f:
+            sql_q = 'UPDATE state_famme set Poumon =?,OS=?,Abdomen_simple=?,UIV=?,Cholecystographie=?,Estomac=?,Echographie=?,Fibroscopie=?,ECG=? where state_famme.m=? and state_famme.y=?'
+            cur.execute(sql_q, (
+                self.Poumon[1], self.OS[1], self.Abdomen_simple[1], self.UIV[1], self.Cholecystographie[1],
+                self.Estomac[1],
+                self.Echographie[1], self.Fibroscopie[1], self.ECG[1], self.month, self.year))
+            connection.commit()
+        else:
+            sql_q = 'INSERT INTO state_famme (m,y,Poumon,OS,Abdomen_simple,UIV,Cholecystographie,Estomac,Echographie,Fibroscopie,ECG) values (?,?,?,?,?,?,?,?,?,?,?)'
+            cur.execute(sql_q, (self.month, self.year, self.Poumon[1], self.OS[1], self.Abdomen_simple[1], self.UIV[1],
+                                self.Cholecystographie[1], self.Estomac[1], self.Echographie[1], self.Fibroscopie[1],
+                                self.ECG[1]))
+            connection.commit()
+
+        if res_e:
+            sql_q = 'UPDATE state_enfant set Poumon =?,OS=?,Abdomen_simple=?,UIV=?,Cholecystographie=?,Estomac=?,Echographie=?,Fibroscopie=?,ECG=? where state_enfant.m=? and state_enfant.y=?'
+            cur.execute(sql_q, (
+                self.Poumon[2], self.OS[2], self.Abdomen_simple[2], self.UIV[2], self.Cholecystographie[2],
+                self.Estomac[2],
+                self.Echographie[2], self.Fibroscopie[2], self.ECG[2], self.month, self.year))
+            connection.commit()
+        else:
+            sql_q = 'INSERT INTO state_enfant (m,y,Poumon,OS,Abdomen_simple,UIV,Cholecystographie,Estomac,Echographie,Fibroscopie,ECG) values (?,?,?,?,?,?,?,?,?,?,?)'
+            cur.execute(sql_q, (self.month, self.year, self.Poumon[2], self.OS[2], self.Abdomen_simple[2], self.UIV[2],
+                                self.Cholecystographie[2], self.Estomac[2], self.Echographie[2], self.Fibroscopie[2],
+                                self.ECG[2]))
+            connection.commit()
+
+        for prog in range(20):
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        connection.close()
+        self._signal.emit(True)
+
+
+class ThreadStateExport(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(list)
+
+    def __init__(self, month, year):
+        super(ThreadStateExport, self).__init__()
+        self.month = month
+        self.year = year
+        self.data = [("Examen", "Homme", "Famme", "Enfant", "Total")]
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_homme where state_homme.m =? and state_homme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_h = cur.fetchall()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_famme where state_famme.m =? and state_famme.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_f = cur.fetchall()
+
+        sql_q = 'SELECT Poumon, OS, Abdomen_simple, UIV, Cholecystographie, Estomac, Echographie, Fibroscopie, ECG FROM state_enfant where state_enfant.m =? and state_enfant.y =?'
+        cur.execute(sql_q, (self.month, self.year))
+        res_e = cur.fetchall()
+
+        self.Poumon = []
+        self.OS = []
+        self.Abdomen_simple = []
+        self.UIV = []
+        self.Cholecystographie = []
+        self.Estomac = []
+        self.Echographie = []
+        self.Fibroscopie = []
+        self.ECG = []
+
+        if res_h:
+            res_h = res_h[0]
+            po = res_h[0]
+            self.Poumon.append(po)
+            os = res_h[1]
+            self.OS.append(os)
+            abd = res_h[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_h[3]
+            self.UIV.append(uiv)
+            chol = res_h[4]
+            self.Cholecystographie.append(chol)
+            est = res_h[5]
+            self.Estomac.append(est)
+            echo = res_h[6]
+            self.Echographie.append(echo)
+            fibr = res_h[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_h[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        if res_f:
+            res_f = res_f[0]
+            po = res_f[0]
+            self.Poumon.append(po)
+            os = res_f[1]
+            self.OS.append(os)
+            abd = res_f[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_f[3]
+            self.UIV.append(uiv)
+            chol = res_f[4]
+            self.Cholecystographie.append(chol)
+            est = res_f[5]
+            self.Estomac.append(est)
+            echo = res_f[6]
+            self.Echographie.append(echo)
+            fibr = res_f[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_f[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        if res_e:
+            res_e = res_e[0]
+            po = res_e[0]
+            self.Poumon.append(po)
+            os = res_e[1]
+            self.OS.append(os)
+            abd = res_e[2]
+            self.Abdomen_simple.append(abd)
+            uiv = res_e[3]
+            self.UIV.append(uiv)
+            chol = res_e[4]
+            self.Cholecystographie.append(chol)
+            est = res_e[5]
+            self.Estomac.append(est)
+            echo = res_e[6]
+            self.Echographie.append(echo)
+            fibr = res_e[7]
+            self.Fibroscopie.append(fibr)
+            ecg = res_e[8]
+            self.ECG.append(ecg)
+        else:
+            self.Poumon.append(0)
+            self.OS.append(0)
+            self.Abdomen_simple.append(0)
+            self.UIV.append(0)
+            self.Cholecystographie.append(0)
+            self.Estomac.append(0)
+            self.Echographie.append(0)
+            self.Fibroscopie.append(0)
+            self.ECG.append(0)
+
+        prog = 0
+        total = self.Poumon[0] + self.Poumon[1] + self.Poumon[2]
+        data_examen = ("Poumon", self.Poumon[0], self.Poumon[1], self.Poumon[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.OS[0] + self.OS[1] + self.OS[2]
+        data_examen = ("OS", self.OS[0], self.OS[1], self.OS[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.Abdomen_simple[0] + self.Abdomen_simple[1] + self.Abdomen_simple[2]
+        data_examen = ("Abdomen simple", self.Abdomen_simple[0], self.Abdomen_simple[1], self.Abdomen_simple[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.UIV[0] + self.UIV[1] + self.UIV[2]
+        data_examen = ("U.I.V", self.UIV[0], self.UIV[1], self.UIV[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.Cholecystographie[0] + self.Cholecystographie[1] + self.Cholecystographie[2]
+        data_examen = (
+            "Cholecystographie", self.Cholecystographie[0], self.Cholecystographie[1], self.Cholecystographie[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.Estomac[0] + self.Estomac[1] + self.Estomac[2]
+        data_examen = ("Estomac", self.Estomac[0], self.Estomac[1], self.Estomac[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.Echographie[0] + self.Echographie[1] + self.Echographie[2]
+        data_examen = ("Echographie", self.Echographie[0], self.Echographie[1], self.Echographie[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.Fibroscopie[0] + self.Fibroscopie[1] + self.Fibroscopie[2]
+        data_examen = ("Fibroscopie", self.Fibroscopie[0], self.Fibroscopie[1], self.Fibroscopie[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total = self.ECG[0] + self.ECG[1] + self.ECG[2]
+        data_examen = ("E.C.G", self.ECG[0], self.ECG[1], self.ECG[2], total)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+        prog = prog + 1
+
+        total1 = self.Poumon[0] + self.OS[0] + self.Abdomen_simple[0] + self.UIV[0] + self.Cholecystographie[0] + \
+                 self.Estomac[0] + self.Echographie[0] + self.Fibroscopie[0] + self.ECG[0]
+        total2 = self.Poumon[1] + self.OS[1] + self.Abdomen_simple[1] + self.UIV[1] + self.Cholecystographie[1] + \
+                 self.Estomac[1] + self.Echographie[1] + self.Fibroscopie[1] + self.ECG[1]
+        total3 = self.Poumon[2] + self.OS[2] + self.Abdomen_simple[2] + self.UIV[2] + self.Cholecystographie[2] + \
+                 self.Estomac[2] + self.Echographie[2] + self.Fibroscopie[2] + self.ECG[2]
+        total4 = total1 + total2 + total3
+
+        data_examen = ("Total", total1, total2, total3, total4)
+        self.data.append(data_examen)
+        time.sleep(0.2)
+        self._signal.emit(int(prog))
+
+        connection.close()
+        self._signal_result.emit(self.data)
+
