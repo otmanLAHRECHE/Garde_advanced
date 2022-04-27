@@ -1,7 +1,11 @@
-from PyQt5 import QtWidgets, uic, QtCore
+import PyQt5
+from PyQt5 import QtWidgets, uic, QtCore, QtGui
 from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
-from dialogs import Threading_loading
+import app
+from dialogs import Threading_loading, CustomDialog, Saving_progress_dialog
+from threads import Thread_state_load, Thread_save_state
 
 
 class RadioStatistiquesUi(QtWidgets.QMainWindow):
@@ -63,7 +67,7 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
         dialog = CustomDialog(message)
         if not self.want_to_close:
             if dialog.exec():
-                self.next_page = radiologie.RadiologieMainUi()
+                self.next_page = app.AppUi("radio")
                 self.next_page.show()
                 self.close()
             else:
@@ -178,7 +182,7 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
 
         elif type(progress) == bool:
             self.dialog.progress.setValue(100)
-            self.dialog.label.setText("complete")
+            self.dialog.ttl.setText("complete")
             self.dialog.close()
 
 
@@ -193,8 +197,12 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
             self.alert_("Entrer des valeurs valide")
         else:
             self.want_to_close = True
-            self.dialog = Saving_progress_dialog()
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
             self.dialog.show()
+
             self.thr = Thread_save_state(self.month, self.year, self.table)
             self.thr._signal.connect(self.signal_accepted_save)
             self.thr._signal_status.connect(self.signal_accepted_save)

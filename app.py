@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidget
 
 import planing_garde
 import recap
+import statestiques
 from custom_widgets import Check
 from dialogs import Threading_loading, Update_worker_dialog, Add_new_month
 from threads import ThreadAddWorker, ThreadLoadWorkers, ThreadUpdateWorker, ThreadDeleteWorker, ThreadLoadGardeMonth, \
@@ -152,6 +153,7 @@ class AppUi(QtWidgets.QMainWindow):
             self.ttl2.setText("nom")
             self.ttl3.setText("Ajouter un radio manipulateur:")
             self.statestiques_button.setEnabled(True)
+            self.statestiques_button.clicked.connect(self.stat)
         elif self.service == "admin":
             self.ttl.setText("EPSP Djanet ( Administration )")
             self.ttl1.setText("Liste des agents d'administration")
@@ -598,6 +600,41 @@ class AppUi(QtWidgets.QMainWindow):
         self.animation.setEndValue(newWidth)  # end value is the new menu width
         self.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
         self.animation.start()
+
+
+    def stat(self):
+        m = self.table_gardes.item(row_selected, 2).text()
+        y = self.table_gardes.item(row_selected, 3).text()
+        if m == "janvier":
+            m = 1
+        elif m == "février":
+            m = 2
+        elif m == "mars":
+            m = 3
+        elif m == "avril":
+            m = 4
+        elif m == "mai":
+            m = 5
+        elif m == "juin":
+            m = 6
+        elif m == "juillet":
+            m = 7
+        elif m == "août":
+            m = 8
+        elif m == "septembre":
+            m = 9
+        elif m == "octobre":
+            m = 10
+        elif m == "novembre":
+            m = 11
+        elif m == "décembre":
+            m = 12
+
+        y = int(y)
+
+        self.next_apge = statestiques.RadioStatistiquesUi(m ,y)
+        self.next_apge.show()
+        self.close()
 
 
     def h(self):
