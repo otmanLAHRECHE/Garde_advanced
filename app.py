@@ -606,38 +606,48 @@ class AppUi(QtWidgets.QMainWindow):
 
 
     def stat(self):
-        m = self.table_gardes.item(row_selected, 2).text()
-        y = self.table_gardes.item(row_selected, 3).text()
-        if m == "janvier":
-            m = 1
-        elif m == "février":
-            m = 2
-        elif m == "mars":
-            m = 3
-        elif m == "avril":
-            m = 4
-        elif m == "mai":
-            m = 5
-        elif m == "juin":
-            m = 6
-        elif m == "juillet":
-            m = 7
-        elif m == "août":
-            m = 8
-        elif m == "septembre":
-            m = 9
-        elif m == "octobre":
-            m = 10
-        elif m == "novembre":
-            m = 11
-        elif m == "décembre":
-            m = 12
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            m = self.table_gardes.item(row_selected, 2).text()
+            y = self.table_gardes.item(row_selected, 3).text()
+            if m == "janvier":
+                m = 1
+            elif m == "février":
+                m = 2
+            elif m == "mars":
+                m = 3
+            elif m == "avril":
+                m = 4
+            elif m == "mai":
+                m = 5
+            elif m == "juin":
+                m = 6
+            elif m == "juillet":
+                m = 7
+            elif m == "août":
+                m = 8
+            elif m == "septembre":
+                m = 9
+            elif m == "octobre":
+                m = 10
+            elif m == "novembre":
+                m = 11
+            elif m == "décembre":
+                m = 12
 
-        y = int(y)
+            y = int(y)
 
-        self.next_apge = statestiques.RadioStatistiquesUi(m ,y)
-        self.next_apge.show()
-        self.close()
+            self.next_apge = statestiques.RadioStatistiquesUi(m ,y)
+            self.next_apge.show()
+            self.close()
 
 
     def h(self):

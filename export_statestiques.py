@@ -1,6 +1,7 @@
 import os
 
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog
 
 import app
@@ -27,8 +28,12 @@ class ExportStatistiqueUi(QtWidgets.QMainWindow):
         self.progress.setValue(0)
         self.status = self.findChild(QtWidgets.QLabel, "label_2")
         self.export = self.findChild(QtWidgets.QPushButton, "pushButton")
+        self.export.setIcon(QIcon("./asstes/images/download2.png"))
         self.export.setEnabled(False)
         self.export.clicked.connect(self.export_pdf)
+        self.preview = self.findChild(QtWidgets.QPushButton, "pushButton_2")
+        self.preview.setEnabled(False)
+        self.preview.setIcon(QIcon("./asstes/images/eye.png"))
         self.status.setText("Preparation des données")
 
         if self.month == 1:

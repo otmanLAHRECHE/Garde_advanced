@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
 import app
+import export_statestiques
 from dialogs import Threading_loading, CustomDialog, Saving_progress_dialog
 from threads import Thread_state_load, Thread_save_state
 
@@ -212,7 +213,7 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
 
     def export_(self):
         self.want_to_close = True
-        self.next_page = export_statistique.ExportStatistiqueUi(self.month, self.year)
+        self.next_page = export_statestiques.ExportStatistiqueUi(self.month, self.year)
         self.next_page.show()
         self.close()
 
