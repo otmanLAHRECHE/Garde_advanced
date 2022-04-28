@@ -200,6 +200,7 @@ class AppUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("Terminer")
             self.dialog.close()
+            self.worker_name.setText("")
             self.load_workers()
 
     def load_workers(self):
@@ -208,6 +209,8 @@ class AppUi(QtWidgets.QMainWindow):
         self.dialog.progress.setValue(0)
         self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.dialog.show()
+
+        self.table_workers.setRowCount(0)
 
         self.thr = ThreadLoadWorkers(self.service)
         self.thr._signal.connect(self.signal_load_workers)
