@@ -7,7 +7,7 @@ import PyQt5
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from database_operations import load_workers, add_worker, update_worker, delete_worker, load_garde_month, \
-    add_garde_month, check_month, delete_garde_month
+    add_garde_month, check_month, delete_garde_month, load_groupes_inf, load_groupes_surv
 from tools import get_workerId_by_name, get_workerService_by_name
 
 
@@ -1308,4 +1308,867 @@ class ThreadStateExport(QThread):
 
         connection.close()
         self._signal_result.emit(self.data)
+
+
+class ThreadAddGroupe(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, name, groupe):
+        super(ThreadAddGroupe, self).__init__()
+        self.name = name
+        self.groupe = groupe
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        sql_q = "INSERT INTO health_worker (full_name,service) values (?,?)"
+        cur.execute(sql_q, (self.name, "urgence_inf"))
+
+        connection.commit()
+
+        id_inf = get_workerId_by_name(self.name, "urgence_inf")
+        id_inf = id_inf[0]
+
+        sql_q = "INSERT INTO groupe (g,inf_id) values (?,?)"
+        cur.execute(sql_q, (self.groupe, id_inf[0]))
+
+        connection.commit()
+        connection.close()
+
+        for n in range(20):
+            self._signal.emit(n)
+            time.sleep(0.1)
+
+        self._signal_result.emit(True)
+
+
+class ThreadUpdateGroupe(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, id, name, groupe):
+        super(ThreadUpdateGroupe, self).__init__()
+        self.name = name
+        self.groupe = groupe
+        self.id = id
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        if self.name == "":
+            sql_q = 'UPDATE groupe SET g= ? WHERE inf_id= ?'
+            cur.execute(sql_q, (self.groupe, self.id))
+        elif self.groupe == "":
+            sql_q = 'UPDATE health_worker SET full_name= ? WHERE worker_id= ?'
+            cur.execute(sql_q, (self.name, self.id))
+        else:
+            sql_q = 'UPDATE groupe SET g= ? WHERE inf_id= ?'
+            cur.execute(sql_q, (self.groupe, self.id))
+
+            sql_q = 'UPDATE health_worker SET full_name= ? WHERE worker_id= ?'
+            cur.execute(sql_q, (self.name, self.id))
+
+        connection.commit()
+        connection.close()
+
+        for n in range(20):
+            self._signal.emit(n)
+            time.sleep(0.1)
+
+        self._signal_result.emit(True)
+
+
+class ThreadGuardUrgenceInf(QThread):
+    _signal = pyqtSignal(int)
+    _signal_groupes = pyqtSignal(list)
+    _signal_result = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year):
+        super(ThreadGuardUrgenceInf, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+        self.data = [("Jours", "Date", "De 08h:00 à 16h:00", "De 16h:00 à 08h:00")]
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        for row in range(self.num_days):
+
+            prog = row * 100 / self.num_days
+            day = row + 1
+            x = datetime.datetime(self.year, self.month, day)
+            m = ""
+            if x.strftime("%A") == "Saturday":
+                m = "Samedi"
+            elif x.strftime("%A") == "Sunday":
+                m = "Dimanche"
+            elif x.strftime("%A") == "Monday":
+                m = "Lundi"
+            elif x.strftime("%A") == "Tuesday":
+                m = "Mardi"
+            elif x.strftime("%A") == "Wednesday":
+                m = "Mercredi"
+            elif x.strftime("%A") == "Thursday":
+                m = "Jeudi"
+            elif x.strftime("%A") == "Friday":
+                m = "Vendredi"
+
+            if self.month / 10 >= 1:
+                if day / 10 >= 1:
+                    date_day = str(day) + "/" + str(self.month) + "/" + str(self.year)
+                else:
+                    date_day = str(0) + str(day) + "/" + str(self.month) + "/" + str(self.year)
+            else:
+                if day / 10 >= 1:
+                    date_day = str(day) + "/" + str(0) + str(self.month) + "/" + str(self.year)
+                else:
+                    date_day = str(0) + str(day) + "/" + str(0) + str(self.month) + "/" + str(self.year)
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            light = ""
+            night = ""
+
+            if results_light:
+                rl = results_light[0]
+                light = light + str(rl[0])
+
+            if results_night:
+                rn = results_night[0]
+                night = night + str(rn[0])
+
+            data_day = (m, date_day, light, night)
+
+            self.data.append(data_day)
+
+            time.sleep(0.3)
+            self._signal.emit(int(prog))
+
+        print(self.data)
+        self._signal_result.emit(self.data)
+
+        sql_q = 'SELECT DISTINCT g FROM groupe'
+        cur.execute(sql_q)
+        groupes = cur.fetchall()
+
+        grs = []
+
+        for groupe in groupes:
+            sql_q = 'SELECT health_worker.full_name FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+            cur.execute(sql_q, (groupe[0],))
+            workers = cur.fetchall()
+            gr = "Groupe " + groupe[0] + ": "
+
+            for worker in workers:
+                gr = gr + worker[0] + " / "
+
+            grs.append(gr)
+
+        self._signal_groupes.emit(grs)
+        connection.close()
+
+        self._signal_finish.emit(True)
+
+
+class Thread_create_urgence_inf_guard(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year, table):
+        super(Thread_create_urgence_inf_guard, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+        self.table = table
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        for row in range(self.num_days):
+            day = row + 1
+            prog = row * 100 / self.num_days
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            check = self.table.cellWidget(row, 2)
+            med_name = check.chose.currentText()
+
+            check_2 = self.table.cellWidget(row, 3)
+            med_name_2 = check_2.chose.currentText()
+
+            if results_light:
+
+                rl = results_light[0]
+
+                if str(rl[0]) == med_name:
+                    print("do nothing")
+                elif str(rl[0]) != med_name and med_name != "":
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (str(rl[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (med_name,))
+                    res2 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe WHERE  guard_groupe.d=? and guard_groupe.m=? and guard_groupe.y=? and guard_groupe.periode =? and guard_groupe.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', str(rl[0])))
+
+                    connection.commit()
+
+                    sql_q = 'INSERT INTO guard_groupe (d,m,y,periode,g) values (?,?,?,?,?)'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', med_name))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+                    for id in res2:
+                        id = id[0]
+                        sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+                elif str(rl[0]) != med_name and med_name == "":
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (str(rl[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe WHERE  guard_groupe.d=? and guard_groupe.m=? and guard_groupe.y=? and guard_groupe.periode =? and guard_groupe.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', str(rl[0])))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+            elif med_name != "":
+
+                sql_q = 'INSERT INTO guard_groupe (d,m,y,periode,g) values (?,?,?,?,?)'
+                cur.execute(sql_q, (day, self.month, self.year, 'light', med_name))
+
+                connection.commit()
+
+                sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                cur.execute(sql_q, (med_name,))
+                res2 = cur.fetchall()
+                for id in res2:
+                    id = id[0]
+                    sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                    cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+            # guard shift night :
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            if results_night:
+                rn = results_night[0]
+
+                if str(rn[0]) == med_name_2:
+                    print("do nothing")
+                elif str(rn[0]) != med_name_2 and med_name_2 != "":
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (str(rn[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (med_name_2,))
+                    res2 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe WHERE  guard_groupe.d=? and guard_groupe.m=? and guard_groupe.y=? and guard_groupe.periode =? and guard_groupe.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', str(rn[0])))
+
+                    connection.commit()
+
+                    sql_q = 'INSERT INTO guard_groupe (d,m,y,periode,g) values (?,?,?,?,?)'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', med_name_2))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+                    for id in res2:
+                        id = id[0]
+                        sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+                elif str(rn[0]) != med_name_2 and med_name_2 == "":
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                    cur.execute(sql_q, (str(rn[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe WHERE  guard_groupe.d=? and guard_groupe.m=? and guard_groupe.y=? and guard_groupe.periode =? and guard_groupe.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', str(rn[0])))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+
+
+            elif med_name_2 != "":
+
+                sql_q = 'INSERT INTO guard_groupe (d,m,y,periode,g) values (?,?,?,?,?)'
+                cur.execute(sql_q, (day, self.month, self.year, 'night', med_name_2))
+
+                connection.commit()
+
+                sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id WHERE groupe.g =?'
+                cur.execute(sql_q, (med_name_2,))
+                res2 = cur.fetchall()
+
+                for id in res2:
+                    id = id[0]
+                    sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                    cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+            connection.commit()
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        connection.close()
+        self._signal.emit(True)
+
+
+class Thread_load_guards_inf_urgences(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year):
+        super(Thread_load_guards_inf_urgences, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        for row in range(self.num_days):
+            day = row + 1
+            prog = row * 100 / self.num_days
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            sql_q = 'SELECT guard_groupe.g FROM guard_groupe WHERE guard_groupe.periode =? and guard_groupe.d =? and guard_groupe.m =? and guard_groupe.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            list = []
+            list.append(row)
+            list.append(results_light)
+            list.append(results_night)
+
+            self._signal.emit(list)
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        connection.close()
+        self._signal_finish.emit(True)
+
+
+class ThreadAddGroupeSurv(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, name, groupe):
+        super(ThreadAddGroupeSurv, self).__init__()
+        self.name = name
+        self.groupe = groupe
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        sql_q = "INSERT INTO health_worker (full_name,service) values (?,?)"
+        cur.execute(sql_q, (self.name, "urgence_surv"))
+
+        connection.commit()
+
+        id_inf = get_workerId_by_name(self.name, "urgence_surv")
+        id_inf = id_inf[0]
+
+        sql_q = "INSERT INTO groupe_surv (g,inf_id) values (?,?)"
+        cur.execute(sql_q, (self.groupe, id_inf[0]))
+
+        connection.commit()
+        connection.close()
+
+        for n in range(20):
+            self._signal.emit(n)
+            time.sleep(0.1)
+
+        self._signal_result.emit(True)
+
+
+class ThreadUpdateGroupeSurv(QThread):
+    _signal = pyqtSignal(int)
+    _signal_result = pyqtSignal(bool)
+
+    def __init__(self, id, name, groupe):
+        super(ThreadUpdateGroupeSurv, self).__init__()
+        self.name = name
+        self.groupe = groupe
+        self.id = id
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        if self.name == "":
+            sql_q = 'UPDATE groupe_surv SET g= ? WHERE inf_id= ?'
+            cur.execute(sql_q, (self.groupe, self.id))
+        elif self.groupe == "":
+            sql_q = 'UPDATE health_worker SET full_name= ? WHERE worker_id= ?'
+            cur.execute(sql_q, (self.name, self.id))
+        else:
+            sql_q = 'UPDATE groupe_surv SET g= ? WHERE inf_id= ?'
+            cur.execute(sql_q, (self.groupe, self.id))
+
+            sql_q = 'UPDATE health_worker SET full_name= ? WHERE worker_id= ?'
+            cur.execute(sql_q, (self.name, self.id))
+
+        connection.commit()
+        connection.close()
+
+        for n in range(20):
+            self._signal.emit(n)
+            time.sleep(0.1)
+
+        self._signal_result.emit(True)
+
+
+class ThreadGuardUrgenceSurv(QThread):
+    _signal = pyqtSignal(int)
+    _signal_groupes = pyqtSignal(list)
+    _signal_result = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year):
+        super(ThreadGuardUrgenceSurv, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+        self.data = [("Jours", "Date", "De 08h:00 à 16h:00", "De 16h:00 à 08h:00")]
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        for row in range(self.num_days):
+
+            prog = row * 100 / self.num_days
+            day = row + 1
+            x = datetime.datetime(self.year, self.month, day)
+            m = ""
+            if x.strftime("%A") == "Saturday":
+                m = "Samedi"
+            elif x.strftime("%A") == "Sunday":
+                m = "Dimanche"
+            elif x.strftime("%A") == "Monday":
+                m = "Lundi"
+            elif x.strftime("%A") == "Tuesday":
+                m = "Mardi"
+            elif x.strftime("%A") == "Wednesday":
+                m = "Mercredi"
+            elif x.strftime("%A") == "Thursday":
+                m = "Jeudi"
+            elif x.strftime("%A") == "Friday":
+                m = "Vendredi"
+
+            if self.month / 10 >= 1:
+                if day / 10 >= 1:
+                    date_day = str(day) + "/" + str(self.month) + "/" + str(self.year)
+                else:
+                    date_day = str(0) + str(day) + "/" + str(self.month) + "/" + str(self.year)
+            else:
+                if day / 10 >= 1:
+                    date_day = str(day) + "/" + str(0) + str(self.month) + "/" + str(self.year)
+                else:
+                    date_day = str(0) + str(day) + "/" + str(0) + str(self.month) + "/" + str(self.year)
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            light = ""
+            night = ""
+
+            if results_light:
+                rl = results_light[0]
+                light = light + str(rl[0])
+
+            if results_night:
+                rn = results_night[0]
+                night = night + str(rn[0])
+
+            data_day = (m, date_day, light, night)
+
+            self.data.append(data_day)
+
+            time.sleep(0.3)
+            self._signal.emit(int(prog))
+
+        print(self.data)
+        self._signal_result.emit(self.data)
+
+        sql_q = 'SELECT DISTINCT g FROM groupe_surv'
+        cur.execute(sql_q)
+        groupes = cur.fetchall()
+
+        grs = []
+
+        for groupe in groupes:
+            sql_q = 'SELECT health_worker.full_name FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+            cur.execute(sql_q, (groupe[0],))
+            workers = cur.fetchall()
+            gr = "Groupe " + groupe[0] + ": "
+
+            for worker in workers:
+                gr = gr + worker[0] + " / "
+
+            grs.append(gr)
+
+        self._signal_groupes.emit(grs)
+        connection.close()
+
+        self._signal_finish.emit(True)
+
+
+class Thread_create_urgence_surv_guard(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year, table):
+        super(Thread_create_urgence_surv_guard, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+        self.table = table
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        for row in range(self.num_days):
+            day = row + 1
+            prog = row * 100 / self.num_days
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            check = self.table.cellWidget(row, 2)
+            med_name = check.chose.currentText()
+
+            check_2 = self.table.cellWidget(row, 3)
+            med_name_2 = check_2.chose.currentText()
+
+            if results_light:
+
+                rl = results_light[0]
+
+                if str(rl[0]) == med_name:
+                    print("do nothing")
+                elif str(rl[0]) != med_name and med_name != "":
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (str(rl[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (med_name,))
+                    res2 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe_surv WHERE  guard_groupe_surv.d=? and guard_groupe_surv.m=? and guard_groupe_surv.y=? and guard_groupe_surv.periode =? and guard_groupe_surv.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', str(rl[0])))
+
+                    connection.commit()
+
+                    sql_q = 'INSERT INTO guard_groupe_surv (d,m,y,periode,g) values (?,?,?,?,?)'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', med_name))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+                    for id in res2:
+                        id = id[0]
+                        sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+                elif str(rl[0]) != med_name and med_name == "":
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (str(rl[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe_surv WHERE  guard_groupe_surv.d=? and guard_groupe_surv.m=? and guard_groupe_surv.y=? and guard_groupe_surv.periode =? and guard_groupe_surv.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'light', str(rl[0])))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+            elif med_name != "":
+
+                sql_q = 'INSERT INTO guard_groupe_surv (d,m,y,periode,g) values (?,?,?,?,?)'
+                cur.execute(sql_q, (day, self.month, self.year, 'light', med_name))
+
+                connection.commit()
+
+                sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                cur.execute(sql_q, (med_name,))
+                res2 = cur.fetchall()
+                for id in res2:
+                    id = id[0]
+                    sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                    cur.execute(sql_q_light, (day, self.month, self.year, 'light', id))
+
+            # guard shift night :
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            if results_night:
+                rn = results_night[0]
+
+                if str(rn[0]) == med_name_2:
+                    print("do nothing")
+                elif str(rn[0]) != med_name_2 and med_name_2 != "":
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (str(rn[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (med_name_2,))
+                    res2 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe_surv WHERE  guard_groupe_surv.d=? and guard_groupe_surv.m=? and guard_groupe_surv.y=? and guard_groupe_surv.periode =? and guard_groupe_surv.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', str(rn[0])))
+
+                    connection.commit()
+
+                    sql_q = 'INSERT INTO guard_groupe_surv (d,m,y,periode,g) values (?,?,?,?,?)'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', med_name_2))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+                    for id in res2:
+                        id = id[0]
+                        sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+                elif str(rn[0]) != med_name_2 and med_name_2 == "":
+                    sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                    cur.execute(sql_q, (str(rn[0]),))
+                    res1 = cur.fetchall()
+
+                    sql_q = 'DELETE FROM guard_groupe_surv WHERE  guard_groupe_surv.d=? and guard_groupe_surv.m=? and guard_groupe_surv.y=? and guard_groupe_surv.periode =? and guard_groupe_surv.g =?'
+                    cur.execute(sql_q, (day, self.month, self.year, 'night', str(rn[0])))
+
+                    connection.commit()
+
+                    for id in res1:
+                        id = id[0]
+                        sql_q_light = 'DELETE FROM guard WHERE guard.d=? and guard.m=? and guard.y=? and guard.periode =? and guard.gardien_id =?'
+                        cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+
+
+            elif med_name_2 != "":
+
+                sql_q = 'INSERT INTO guard_groupe_surv (d,m,y,periode,g) values (?,?,?,?,?)'
+                cur.execute(sql_q, (day, self.month, self.year, 'night', med_name_2))
+
+                connection.commit()
+
+                sql_q = 'SELECT health_worker.worker_id FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id WHERE groupe_surv.g =?'
+                cur.execute(sql_q, (med_name_2,))
+                res2 = cur.fetchall()
+
+                for id in res2:
+                    id = id[0]
+                    sql_q_light = 'INSERT INTO guard (d,m,y,periode,gardien_id) values (?,?,?,?,?)'
+                    cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
+
+            connection.commit()
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        connection.close()
+        self._signal.emit(True)
+
+
+class Thread_load_guards_surv_urgences(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self, num_days, month, year):
+        super(Thread_load_guards_surv_urgences, self).__init__()
+        self.num_days = num_days
+        self.month = month
+        self.year = year
+
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+
+        for row in range(self.num_days):
+            day = row + 1
+            prog = row * 100 / self.num_days
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('light', day, self.month, self.year))
+            results_light = cur.fetchall()
+
+            sql_q = 'SELECT guard_groupe_surv.g FROM guard_groupe_surv WHERE guard_groupe_surv.periode =? and guard_groupe_surv.d =? and guard_groupe_surv.m =? and guard_groupe_surv.y =?'
+            cur.execute(sql_q, ('night', day, self.month, self.year))
+            results_night = cur.fetchall()
+
+            list = []
+            list.append(row)
+            list.append(results_light)
+            list.append(results_night)
+
+            self._signal.emit(list)
+            time.sleep(0.1)
+            self._signal_status.emit(int(prog))
+
+        connection.close()
+        self._signal_finish.emit(True)
+
+
+class ThreadLoadInf(QThread):
+    _signal_status = pyqtSignal(int)
+    _signal_inf = pyqtSignal(list)
+    _signal_surv = pyqtSignal(list)
+    _signal_finish = pyqtSignal(bool)
+
+    def __init__(self):
+        super(ThreadLoadInf, self).__init__()
+    def __del__(self):
+        self.terminate()
+        self.wait()
+
+    def run(self):
+
+        infirmiers = load_groupes_inf()
+        surveillants = load_groupes_surv()
+
+        for i in range(30):
+            self._signal_status.emit(i)
+
+        list_inf = []
+        ind_inf = 0
+        for inf in infirmiers:
+            list_inf.append(ind_inf)
+            list_inf.append(inf)
+            self._signal_inf.emit(list_inf)
+            ind_inf = ind_inf + 1
+
+        list_surv = []
+        ind_surv = 0
+        for surv in surveillants:
+            list_surv.append(ind_surv)
+            list_surv.append(surv)
+            self._signal_surv.emit(list_surv)
+            ind_surv = ind_surv + 1
+
+        for i in range(31, 99):
+            self._signal_status.emit(i)
+
+        self._signal_finish.emit(True)
+
+
+
+
+
 

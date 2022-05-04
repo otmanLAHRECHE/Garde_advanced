@@ -5,6 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QApplication, QGraphicsDropShadowEffect
 import app
+import app_inf_urgence
 
 
 class ChoseService(QtWidgets.QMainWindow):
@@ -36,7 +37,7 @@ class ChoseService(QtWidgets.QMainWindow):
             self.next_page.show()
             self.close()
         elif self.chose.currentIndex() == 2:
-            self.next_page = app.AppUi("inf")
+            self.next_page = app_inf_urgence.AppInfUi("inf")
             self.next_page.show()
             self.close()
         elif self.chose.currentIndex() == 3:
