@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidget
 import planing_garde
 from custom_widgets import Check
 from dialogs import Add_new_inf, Threading_loading
-from threads import ThreadAddWorker, ThreadAddGroupe, ThreadLoadWorkers, ThreadLoadInf, ThreadAddGroupeSurv
+from threads import ThreadAddWorker, ThreadAddGroupe, ThreadLoadWorkers, ThreadLoadInf, ThreadAddGroupeSurv, \
+    ThreadUpdateGroupe
 
 WINDOW_SIZE = 0
 
@@ -237,6 +238,85 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.thr._signal.connect(self.signal_add_worker)
                 self.thr._signal_result.connect(self.signal_add_worker)
                 self.thr.start()
+
+    def edit_worker_inf(self):
+        ch = 0
+        for row in range(self.table_workers_inf.rowCount()):
+            if self.table_workers_inf.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un infirmier")
+            for row in range(self.table_workers_inf.rowCount()):
+                self.table_workers_inf.cellWidget(row, 1).check.setChecked(False)
+        else:
+            dialog = Add_new_inf()
+            dialog.ttl.setText("update infirmier:")
+            dialog.nom.setText(self.table_workers_inf.item(row_selected, 2).text())
+            dialog.groupe.setCurrentText(self.table_workers_inf.item(row_selected, 3).text())
+            if dialog.exec() == QtWidgets.QDialog.Accepted:
+                if dialog.nom.text() == "":
+                    message = "enter un valide nom"
+                    self.alert_(message)
+                else:
+                    self.dialog = Threading_loading()
+                    self.dialog.ttl.setText("إنتظر من فضلك")
+                    self.dialog.progress.setValue(0)
+                    self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                    self.dialog.show()
+
+                    self.thr = ThreadUpdateGroupe(int(self.table_workers_inf.item(row_selected, 0).text()),
+                                                  dialog.nom.text(), dialog.groupe.currentText())
+                    self.thr._signal.connect(self.signal_edit_worker_inf)
+                    self.thr._signal_list.connect(self.signal_edit_worker_inf)
+                    self.thr._signal_result.connect(self.signal_edit_worker_inf)
+                    self.thr.start()
+
+    def edit_worker_surv(self):
+        ch = 0
+        for row in range(self.table_workers_surv.rowCount()):
+            if self.table_workers_surv.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un surveillant")
+            for row in range(self.table_workers_surv.rowCount()):
+                self.table_workers_surv.cellWidget(row, 1).check.setChecked(False)
+        else:
+            dialog = Add_new_inf()
+            dialog.ttl.setText("update infirmier:")
+            dialog.nom.setText(self.table_workers_surv.item(row_selected, 2).text())
+            dialog.groupe.setCurrentText(self.table_workers_surv.item(row_selected, 3).text())
+            if dialog.exec() == QtWidgets.QDialog.Accepted:
+                if dialog.nom.text() == "":
+                    message = "enter un valide nom"
+                    self.alert_(message)
+                else:
+                    self.dialog = Threading_loading()
+                    self.dialog.ttl.setText("إنتظر من فضلك")
+                    self.dialog.progress.setValue(0)
+                    self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                    self.dialog.show()
+
+                    self.thr = ThreadUpdateGroupe(int(self.table_workers_surv.item(row_selected, 0).text()),
+                                                  dialog.nom.text(), dialog.groupe.currentText())
+                    self.thr._signal.connect(self.signal_edit_worker_inf)
+                    self.thr._signal_list.connect(self.signal_edit_worker_inf)
+                    self.thr._signal_result.connect(self.signal_edit_worker_inf)
+                    self.thr.start()
+
+
+    def signal_edit_worker_inf(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.worker_name.setText("")
+            self.table_workers_inf.setRowCount(0)
+            self.table_workers_surv.setRowCount(0)
+            self.load_workers_all()
 
 
 
