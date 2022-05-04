@@ -8,9 +8,9 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidget
 import planing_garde
 from custom_widgets import Check
 from database_operations import delete_worker
-from dialogs import Add_new_inf, Threading_loading
+from dialogs import Add_new_inf, Threading_loading, Add_new_month
 from threads import ThreadAddWorker, ThreadAddGroupe, ThreadLoadWorkers, ThreadLoadInf, ThreadAddGroupeSurv, \
-    ThreadUpdateGroupe, ThreadUpdateGroupeSurv
+    ThreadUpdateGroupe, ThreadUpdateGroupeSurv, ThreadAddGardeMonth, ThreadDeleteGardeMonth, ThreadLoadGardeMonth
 
 WINDOW_SIZE = 0
 
@@ -130,14 +130,20 @@ class AppInfUi(QtWidgets.QMainWindow):
         self.statestiques_button = self.findChild(QtWidgets.QPushButton, "pushButton_25")
         self.statestiques_button.setIcon(QIcon("./icons/file-text.png"))
 
-        self.add_worker_button_inf.clicked.connect(self.add_worker)
-        self.edit_worker_button_inf.clicked.connect(self.edit_worker)
-        self.delete_worker_button_inf.clicked.connect(self.delete_worker)
+        self.add_worker_button_inf.clicked.connect(self.add_worker_inf)
+        self.edit_worker_button_inf.clicked.connect(self.edit_worker_inf)
+        self.delete_worker_button_inf.clicked.connect(self.delete_worker_inf)
+
+        self.add_worker_button_surv.clicked.connect(self.add_worker_surv)
+        self.edit_worker_button_surv.clicked.connect(self.edit_worker_surv)
+        self.delete_worker_button_surv.clicked.connect(self.delete_worker_surv)
+
         self.add_planing_button.clicked.connect(self.add_planing)
         self.delete_planing_button.clicked.connect(self.delete_planing)
-        self.garde_button.clicked.connect(self.garde)
-        self.recap_button.clicked.connect(self.recap)
-        self.statestiques_button.clicked.connect(self.statestiques)
+        self.garde_button_inf.clicked.connect(self.garde)
+        self.garde_button_surv.clicked.connect(self.garde_surv)
+        self.recap_button.setEnabled(False)
+        self.statestiques_button.setEnabled(False)
 
         self.load_workers_all()
 
@@ -181,11 +187,11 @@ class AppInfUi(QtWidgets.QMainWindow):
         self.table_workers_inf.setRowCount(0)
         self.table_workers_surv.setRowCount(0)
 
-        self.thr = ThreadLoadInf(self.service)
-        self.thr._signal.connect(self.signal_load_workers_inf)
+        self.thr = ThreadLoadInf()
+        self.thr._signal_status.connect(self.signal_load_workers_inf)
         self.thr._signal_inf.connect(self.signal_load_workers_inf)
         self.thr._signal_surv.connect(self.signal_load_workers_surv)
-        self.thr._signal_result.connect(self.signal_load_workers_inf)
+        self.thr._signal_finish.connect(self.signal_load_workers_inf)
         self.thr.start()
 
     def signal_load_workers_inf(self, progress):
@@ -352,7 +358,255 @@ class AppInfUi(QtWidgets.QMainWindow):
             self.load_workers_all()
 
 
+    def load_garde_month(self):
+        self.dialog = Threading_loading()
+        self.dialog.ttl.setText("إنتظر من فضلك")
+        self.dialog.progress.setValue(0)
+        self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.dialog.show()
 
+        self.thr = ThreadLoadGardeMonth(self.service)
+        self.thr._signal.connect(self.signal_load_garde_month)
+        self.thr._signal_list.connect(self.signal_load_garde_month)
+        self.thr._signal_result.connect(self.signal_load_garde_month)
+        self.thr.start()
+
+    def signal_load_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+            row = progress[0]
+            print(row)
+            month = progress[1]
+            self.table_gardes.insertRow(row)
+            self.table_gardes.setRowHeight(row, 40)
+            check = Check()
+            self.table_gardes.setItem(row, 0, QTableWidgetItem(str(month[0])))
+            self.table_gardes.setCellWidget(row, 1, check)
+            m = ""
+            if month[1] == 1:
+                m = "janvier"
+            elif month[1] == 2:
+                m = "février"
+            elif month[1] == 3:
+                m = "mars"
+            elif month[1] == 4:
+                m = "avril"
+            elif month[1] == 5:
+                m = "mai"
+            elif month[1] == 6:
+                m = "juin"
+            elif month[1] == 7:
+                m = "juillet"
+            elif month[1] == 8:
+                m = "août"
+            elif month[1] == 9:
+                m = "septembre"
+            elif month[1] == 10:
+                m = "octobre"
+            elif month[1] == 11:
+                m = "novembre"
+            elif month[1] == 12:
+                m = "décembre"
+            self.table_gardes.setItem(row, 2, QTableWidgetItem(str(m)))
+            self.table_gardes.setItem(row, 3, QTableWidgetItem(str(month[2])))
+            self.table_gardes.setItem(row, 4, QTableWidgetItem(str(month[3])))
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+
+    def add_planing(self):
+        dialog = Add_new_month()
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            if dialog.year.text() == "":
+                message = "Entrer une valid année"
+                self.alert_(message)
+            else:
+                m = 0
+                if dialog.month.currentIndex() == 0:
+                    m = 1
+                elif dialog.month.currentIndex() == 1:
+                    m = 2
+                elif dialog.month.currentIndex() == 2:
+                    m = 3
+                elif dialog.month.currentIndex() == 3:
+                    m = 4
+                elif dialog.month.currentIndex() == 4:
+                    m = 5
+                elif dialog.month.currentIndex() == 5:
+                    m = 6
+                elif dialog.month.currentIndex() == 6:
+                    m = 7
+                elif dialog.month.currentIndex() == 7:
+                    m = 8
+                elif dialog.month.currentIndex() == 8:
+                    m = 9
+                elif dialog.month.currentIndex() == 9:
+                    m = 10
+                elif dialog.month.currentIndex() == 10:
+                    m = 11
+                elif dialog.month.currentIndex() == 11:
+                    m = 12
+
+                self.dialog = Threading_loading()
+                self.dialog.ttl.setText("إنتظر من فضلك")
+                self.dialog.progress.setValue(0)
+                self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+                self.dialog.show()
+
+                self.thr = ThreadAddGardeMonth(self.service, m, int(dialog.year.text()))
+                self.thr._signal.connect(self.signal_add_garde_month)
+                self.thr._signal_result.connect(self.signal_add_garde_month)
+                self.thr.start()
+
+    def signal_add_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            if progress == True:
+                self.dialog.progress.setValue(100)
+                self.dialog.ttl.setText("complete")
+                self.dialog.close()
+                self.table_gardes.setRowCount(0)
+                self.load_garde_month()
+            else:
+                self.dialog.progress.setValue(100)
+                self.dialog.ttl.setText("complete")
+                self.dialog.close()
+                message = "le mois est déjà existant"
+                self.alert_(message)
+
+
+    def delete_planing(self):
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            self.dialog = Threading_loading()
+            self.dialog.ttl.setText("إنتظر من فضلك")
+            self.dialog.progress.setValue(0)
+            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.dialog.show()
+
+            self.thr = ThreadDeleteGardeMonth(int(self.table_gardes.item(row_selected, 0).text()))
+            self.thr._signal.connect(self.signal_delete_garde_month)
+            self.thr._signal_list.connect(self.signal_delete_garde_month)
+            self.thr._signal_result.connect(self.signal_delete_garde_month)
+            self.thr.start()
+
+    def signal_delete_garde_month(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("Terminer")
+            self.dialog.close()
+            self.table_gardes.setRowCount(0)
+            self.load_garde_month()
+
+    def garde(self):
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            m = self.table_gardes.item(row_selected, 2).text()
+            y = self.table_gardes.item(row_selected, 3).text()
+            if m == "janvier":
+                m = 1
+            elif m == "février":
+                m = 2
+            elif m == "mars":
+                m = 3
+            elif m == "avril":
+                m = 4
+            elif m == "mai":
+                m = 5
+            elif m == "juin":
+                m = 6
+            elif m == "juillet":
+                m = 7
+            elif m == "août":
+                m = 8
+            elif m == "septembre":
+                m = 9
+            elif m == "octobre":
+                m = 10
+            elif m == "novembre":
+                m = 11
+            elif m == "décembre":
+                m = 12
+
+            y = int(y)
+
+            self.next_page = planing_garde.GuardUi("inf", m, y)
+            self.next_page.show()
+            self.close()
+
+
+    def garde_surv(self):
+        ch = 0
+        for row in range(self.table_gardes.rowCount()):
+            if self.table_gardes.cellWidget(row, 1).check.isChecked():
+                row_selected = row
+                ch = ch + 1
+        if ch > 1 or ch == 0:
+            self.alert_("selectioner just un mois")
+            for row in range(self.table_workers.rowCount()):
+                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+        else:
+            m = self.table_gardes.item(row_selected, 2).text()
+            y = self.table_gardes.item(row_selected, 3).text()
+            if m == "janvier":
+                m = 1
+            elif m == "février":
+                m = 2
+            elif m == "mars":
+                m = 3
+            elif m == "avril":
+                m = 4
+            elif m == "mai":
+                m = 5
+            elif m == "juin":
+                m = 6
+            elif m == "juillet":
+                m = 7
+            elif m == "août":
+                m = 8
+            elif m == "septembre":
+                m = 9
+            elif m == "octobre":
+                m = 10
+            elif m == "novembre":
+                m = 11
+            elif m == "décembre":
+                m = 12
+
+            y = int(y)
+
+            self.next_page = planing_garde.GuardUi("surv", m, y)
+            self.next_page.show()
+            self.close()
+
+
+
+    def alert_(self, message):
+        alert = QMessageBox()
+        alert.setWindowTitle("alert")
+        alert.setText(message)
+        alert.exec_()
 
 
 
@@ -377,7 +631,7 @@ class AppInfUi(QtWidgets.QMainWindow):
 
         self.table_workers_inf.setRowCount(0)
         self.table_workers_surv.setRowCount(0)
-        self.load_workers()
+        self.load_workers_all()
 
 
     def sort(self):
@@ -414,3 +668,46 @@ class AppInfUi(QtWidgets.QMainWindow):
         padding-left: 50px;
         background-position: center left;""")
         self.fragment.setCurrentIndex(2)
+
+
+    def mousePressEvent(self, event):
+        self.clickPosition = event.globalPos()
+
+    def restore_or_maximize_window(self):
+        global WINDOW_SIZE
+        win_status = WINDOW_SIZE
+
+        if win_status == 0:
+            WINDOW_SIZE = 1
+            self.showMaximized()
+            self.restoreButton.setIcon(QtGui.QIcon("./icons/minimize.png"))  # Show minized icon
+        else:
+            WINDOW_SIZE = 0
+            self.showNormal()
+            self.restoreButton.setIcon(QtGui.QIcon("./icons/maximize.png"))  # Show maximize icon
+
+    def slideLeftMenu(self):
+        width = self.left_side_menu.width()
+
+        # If minimized
+        if width == 50:
+            # Expand menu
+            newWidth = 180
+            self.pushButton_4.setText(" Travailleurs")
+            self.pushButton_3.setText(" Planing")
+            self.pushButton_2.setText("  Parametre")
+
+        else:
+            # Restore menu
+            newWidth = 50
+            self.pushButton_4.setText("ttttttttt")
+            self.pushButton_3.setText("tttttttt")
+            self.pushButton_2.setText(" tttttttttttttttttttttt")
+
+        # Animate the transition
+        self.animation = QPropertyAnimation(self.left_side_menu, b"minimumWidth")  # Animate minimumWidht
+        self.animation.setDuration(250)
+        self.animation.setStartValue(width)  # Start value is the current menu width
+        self.animation.setEndValue(newWidth)  # end value is the new menu width
+        self.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
+        self.animation.start()

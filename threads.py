@@ -2146,17 +2146,19 @@ class ThreadLoadInf(QThread):
         for i in range(30):
             self._signal_status.emit(i)
 
-        list_inf = []
+
         ind_inf = 0
         for inf in infirmiers:
+            list_inf = []
             list_inf.append(ind_inf)
             list_inf.append(inf)
             self._signal_inf.emit(list_inf)
             ind_inf = ind_inf + 1
 
-        list_surv = []
+
         ind_surv = 0
         for surv in surveillants:
+            list_surv = []
             list_surv.append(ind_surv)
             list_surv.append(surv)
             self._signal_surv.emit(list_surv)
