@@ -83,7 +83,7 @@ class ExportGardeUi(QtWidgets.QMainWindow):
             self.ttl.setText("Imprimer planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
 
         elif self.service == "surv":
-            self.ttl.setText("EPSP Djanet ( Infirmiers d'urgences )")
+            self.ttl.setText("EPSP Djanet ( Surveillants d'urgences )")
             self.ttl.setText("Imprimer planing de garde infirmiers surveillants mois " + str(m) + "/" + str(self.year) + ":")
 
         elif self.service == "pharm":

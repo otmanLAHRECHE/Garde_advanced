@@ -14,7 +14,8 @@ from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 
 import os
 
-from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard, Thread_load_guards_inf_urgences
+from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard, Thread_load_guards_inf_urgences, \
+    Thread_create_urgence_inf_guard, Thread_create_urgence_surv_guard
 from widgets import Chose_worker
 
 
@@ -153,12 +154,12 @@ class GuardUi(QtWidgets.QMainWindow):
         self.dialog.show()
 
         if self.service == "inf" :
-            self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr = Thread_create_urgence_inf_guard(self.service, self.num_days, self.month, self.year, self.table)
             self.thr._signal.connect(self.signal_accepted)
             self.thr._signal_status.connect(self.signal_accepted)
             self.thr.start()
         elif self.service == "surv":
-            self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr = Thread_create_urgence_surv_guard(self.service, self.num_days, self.month, self.year, self.table)
             self.thr._signal.connect(self.signal_accepted)
             self.thr._signal_status.connect(self.signal_accepted)
             self.thr.start()
