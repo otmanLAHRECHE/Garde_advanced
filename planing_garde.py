@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QTableWidgetItem, qApp, QMessageBox
 
 import app
+import app_inf_urgence
 import export_garde
 from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 
@@ -161,9 +162,15 @@ class GuardUi(QtWidgets.QMainWindow):
         dialog = CustomDialog(message)
         if not self.want_to_close:
             if dialog.exec():
-                self.next_page = app.AppUi(self.service)
-                self.next_page.show()
-                self.close()
+                if self.service == "inf" or self.service == "surv":
+                    self.next_page = app_inf_urgence.AppInfUi(self.service)
+                    self.next_page.show()
+                    self.close()
+                else:
+                    self.next_page = app.AppUi(self.service)
+                    self.next_page.show()
+                    self.close()
+
             else:
                 a0.ignore()
         else:

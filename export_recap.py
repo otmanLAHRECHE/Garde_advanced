@@ -77,7 +77,6 @@ class ExportRecapUi(QtWidgets.QMainWindow):
         elif self.service == "dentiste_inf":
             self.ttl.setText("Imprimer RECAP infirmiers dentaire mois " + str(m) + "/" + str(self.year) + ":")
 
-
         elif self.service == "pharm":
             self.ttl.setText("Imprimer RECAP pharmacie mois " + str(m) + "/" + str(self.year) + ":")
 

@@ -95,12 +95,14 @@ class AppInfUi(QtWidgets.QMainWindow):
 
         self.table_workers_inf.hideColumn(0)
         self.table_workers_inf.setColumnWidth(1, 40)
-        self.table_workers_inf.setColumnWidth(2, 280)
-        self.table_workers_inf.setColumnWidth(3, 130)
+        self.table_workers_inf.setColumnWidth(2, 150)
+        self.table_workers_inf.setColumnWidth(3, 70)
+        self.table_workers_inf.setColumnWidth(4, 80)
         self.table_workers_surv.hideColumn(0)
         self.table_workers_surv.setColumnWidth(1, 40)
-        self.table_workers_surv.setColumnWidth(2, 280)
-        self.table_workers_surv.setColumnWidth(3, 130)
+        self.table_workers_surv.setColumnWidth(2, 150)
+        self.table_workers_surv.setColumnWidth(3, 70)
+        self.table_workers_surv.setColumnWidth(4, 80)
 
 
 
@@ -162,7 +164,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
                 self.dialog.show()
 
-                self.thr = ThreadAddGroupe(dialog.nom.text(), self.worker_name.text())
+                self.thr = ThreadAddGroupe(dialog.nom.text(), dialog.groupe.currentText())
                 self.thr._signal.connect(self.signal_add_worker)
                 self.thr._signal_result.connect(self.signal_add_worker)
                 self.thr.start()
@@ -174,7 +176,6 @@ class AppInfUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("Terminer")
             self.dialog.close()
-            self.worker_name.setText("")
             self.load_workers_all()
 
     def load_workers_all(self):
@@ -240,7 +241,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
                 self.dialog.show()
 
-                self.thr = ThreadAddGroupeSurv(dialog.nom.text(), self.worker_name.text())
+                self.thr = ThreadAddGroupeSurv(dialog.nom.text(), dialog.groupe.currentText())
                 self.thr._signal.connect(self.signal_add_worker)
                 self.thr._signal_result.connect(self.signal_add_worker)
                 self.thr.start()
@@ -518,7 +519,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 ch = ch + 1
         if ch > 1 or ch == 0:
             self.alert_("selectioner just un mois")
-            for row in range(self.table_workers.rowCount()):
+            for row in range(self.table_gardes.rowCount()):
                 self.table_workers.cellWidget(row, 1).check.setChecked(False)
         else:
             m = self.table_gardes.item(row_selected, 2).text()
@@ -563,8 +564,8 @@ class AppInfUi(QtWidgets.QMainWindow):
                 ch = ch + 1
         if ch > 1 or ch == 0:
             self.alert_("selectioner just un mois")
-            for row in range(self.table_workers.rowCount()):
-                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+            for row in range(self.table_gardes.rowCount()):
+                self.table_gardes.cellWidget(row, 1).check.setChecked(False)
         else:
             m = self.table_gardes.item(row_selected, 2).text()
             y = self.table_gardes.item(row_selected, 3).text()
