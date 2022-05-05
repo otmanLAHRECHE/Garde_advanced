@@ -193,7 +193,7 @@ QPushButton:hover{
               <rect>
                <x>10</x>
                <y>10</y>
-               <width>281</width>
+               <width>341</width>
                <height>31</height>
               </rect>
              </property>
@@ -202,7 +202,7 @@ QPushButton:hover{
 color: rgb(255, 255, 255);</string>
              </property>
              <property name="text">
-              <string>EPSP Djanet ( chirurgie dentaire )</string>
+              <string>EPSP Djanet ( Infirmiers et surveillants )</string>
              </property>
             </widget>
            </widget>
@@ -522,7 +522,7 @@ background-position: center left;</string>
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="home">
              <widget class="QLabel" name="label">

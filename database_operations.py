@@ -78,7 +78,7 @@ def load_groupes_inf():
     connection = sqlite3.connect("database/sqlite.db")
     cur = connection.cursor()
     sql_q = 'SELECT health_worker.worker_id, health_worker.full_name, health_worker.service, groupe.g  FROM health_worker INNER JOIN groupe ON health_worker.worker_id = groupe.inf_id where health_worker.service=?'
-    cur.execute(sql_q, ('urgence_inf',))
+    cur.execute(sql_q, ('inf',))
     results = cur.fetchall()
     connection.close()
     return results
@@ -87,7 +87,7 @@ def load_groupes_surv():
     connection = sqlite3.connect("database/sqlite.db")
     cur = connection.cursor()
     sql_q = 'SELECT health_worker.worker_id, health_worker.full_name, health_worker.service, groupe_surv.g  FROM health_worker INNER JOIN groupe_surv ON health_worker.worker_id = groupe_surv.inf_id where health_worker.service=?'
-    cur.execute(sql_q, ('urgence_surv',))
+    cur.execute(sql_q, ('surv',))
     results = cur.fetchall()
     connection.close()
     return results
