@@ -152,10 +152,21 @@ class GuardUi(QtWidgets.QMainWindow):
         self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.dialog.show()
 
-        self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
-        self.thr._signal.connect(self.signal_accepted)
-        self.thr._signal_status.connect(self.signal_accepted)
-        self.thr.start()
+        if self.service == "inf" :
+            self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr._signal.connect(self.signal_accepted)
+            self.thr._signal_status.connect(self.signal_accepted)
+            self.thr.start()
+        elif self.service == "surv":
+            self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr._signal.connect(self.signal_accepted)
+            self.thr._signal_status.connect(self.signal_accepted)
+            self.thr.start()
+        else:
+            self.thr = Thread_create_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr._signal.connect(self.signal_accepted)
+            self.thr._signal_status.connect(self.signal_accepted)
+            self.thr.start()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         message = "Votre liste de garde na pas sauvgarder, es-tu sûr de quiter"
