@@ -91,3 +91,19 @@ def load_groupes_surv():
     results = cur.fetchall()
     connection.close()
     return results
+
+def delete_group_inf(id_inf):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = 'DELETE FROM group WHERE inf_id=?'
+    cur.execute(sql_q, (id_inf,))
+    connection.commit()
+    connection.close()
+
+def delete_group_surv(id_inf):
+    connection = sqlite3.connect("database/sqlite.db")
+    cur = connection.cursor()
+    sql_q = 'DELETE FROM group_surv WHERE inf_id=?'
+    cur.execute(sql_q, (id_inf,))
+    connection.commit()
+    connection.close()

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMessageBox, QTableWidget
 
 import planing_garde
 from custom_widgets import Check
-from database_operations import delete_worker
+from database_operations import delete_worker, delete_group_inf, delete_group_surv
 from dialogs import Add_new_inf, Threading_loading, Add_new_month
 from threads import ThreadAddWorker, ThreadAddGroupe, ThreadLoadWorkers, ThreadLoadInf, ThreadAddGroupeSurv, \
     ThreadUpdateGroupe, ThreadUpdateGroupeSurv, ThreadAddGardeMonth, ThreadDeleteGardeMonth, ThreadLoadGardeMonth
@@ -337,6 +337,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.table_workers_inf.cellWidget(row, 1).check.setChecked(False)
         else:
             delete_worker(int(self.table_workers_inf.item(row_selected, 0).text()))
+            delete_group_inf(int(self.table_workers_surv.item(row_selected, 0).text()))
             self.table_workers_inf.removeRow(row_selected)
             self.table_workers_inf.removeRow(0)
             self.load_workers_all()
@@ -353,6 +354,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.table_workers_surv.cellWidget(row, 1).check.setChecked(False)
         else:
             delete_worker(int(self.table_workers_surv.item(row_selected, 0).text()))
+            delete_group_surv(int(self.table_workers_surv.item(row_selected, 0).text()))
             self.table_workers_surv.removeRow(row_selected)
             self.load_workers_all()
 

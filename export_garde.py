@@ -116,6 +116,8 @@ class ExportGardeUi(QtWidgets.QMainWindow):
                 self.next_page.show()
                 self.close()
 
+
+
     def signal_accept(self, progress):
         if type(progress) == int:
             self.progress.setValue(progress)
