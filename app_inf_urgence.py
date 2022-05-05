@@ -336,8 +336,8 @@ class AppInfUi(QtWidgets.QMainWindow):
             for row in range(self.table_workers_inf.rowCount()):
                 self.table_workers_inf.cellWidget(row, 1).check.setChecked(False)
         else:
-            self.table_workers_inf.removeRow(row_selected)
             delete_worker(int(self.table_workers_inf.item(row_selected, 0).text()))
+            self.table_workers_inf.removeRow(row_selected)
             self.table_workers_inf.removeRow(0)
             self.load_workers_all()
 
@@ -352,9 +352,8 @@ class AppInfUi(QtWidgets.QMainWindow):
             for row in range(self.table_workers_surv.rowCount()):
                 self.table_workers_surv.cellWidget(row, 1).check.setChecked(False)
         else:
-            self.table_workers_surv.removeRow(row_selected)
             delete_worker(int(self.table_workers_surv.item(row_selected, 0).text()))
-            self.table_workers_surv.removeRow(0)
+            self.table_workers_surv.removeRow(row_selected)
             self.load_workers_all()
 
 
