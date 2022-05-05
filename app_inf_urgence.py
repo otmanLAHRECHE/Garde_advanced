@@ -227,7 +227,6 @@ class AppInfUi(QtWidgets.QMainWindow):
             self.table_workers_surv.setItem(row, 4, QTableWidgetItem(str(inf[3])))
 
     def add_worker_surv(self):
-
         dialog = Add_new_inf()
         dialog.ttl.setText("Ajouter un surveillant")
         if dialog.exec() == QtWidgets.QDialog.Accepted:

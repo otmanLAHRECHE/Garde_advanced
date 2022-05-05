@@ -13,7 +13,7 @@ from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 
 import os
 
-from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard
+from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard, Thread_load_guards_inf_urgences
 from widgets import Chose_worker
 
 
@@ -75,32 +75,48 @@ class GuardUi(QtWidgets.QMainWindow):
 
         if self.service == "urgence":
             self.ttl.setText("Planing de garde urgence mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "dentiste":
             self.ttl.setText("Planing de garde chirurgie dentaire mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "labo":
             self.ttl.setText("Planing de garde laboratoire mois " + str(m) + "/" + str(self.year) + ":")
-
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "radio":
             self.ttl.setText("Planing de garde radiologie mois " + str(m) + "/" + str(self.year) + ":")
 
         elif self.service == "admin":
             self.ttl.setText("Planing de garde administration mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "dentiste_inf":
             self.ttl.setText("Planing de garde infirmiers dentaire mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "inf":
             self.ttl.setText("Planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_groups_inf()
+            self.load_guards_inf()
+
+        elif self.service == "surv":
+            self.ttl.setText("Planing de garde surveillants d'urgences mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_groups_surv()
+            self.load_guards_surv()
 
         elif self.service == "pharm":
             self.ttl.setText("Planing de garde pharmacie mois " + str(m) + "/" + str(self.year) + ":")
+            self.load_med()
+            self.load_guards()
 
 
-        self.load_med()
-        self.load_guards()
         self.exportPd.clicked.connect(self.export)
 
         self.save.clicked.connect(self.save_)
@@ -295,6 +311,149 @@ class GuardUi(QtWidgets.QMainWindow):
                 self.table.setCellWidget(progress[0], 2, chose_light)
                 self.table.setCellWidget(progress[0], 3, chose_night)
         else:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("complete")
+            self.dialog.close()
+
+
+    def load_groups_inf(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        sql_q = 'SELECT DISTINCT g FROM groupe'
+        cur.execute(sql_q)
+        self.medcins = cur.fetchall()
+        connection.close()
+
+    def load_groups_surv(self):
+        connection = sqlite3.connect("database/sqlite.db")
+        cur = connection.cursor()
+        sql_q = 'SELECT DISTINCT g FROM groupe_surv'
+        cur.execute(sql_q)
+        self.medcins = cur.fetchall()
+        connection.close()
+
+    def load_guards_inf(self):
+        self.dialog = Threading_loading()
+        self.dialog.ttl.setText("إنتظر من فضلك")
+        self.dialog.progress.setValue(0)
+        self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.dialog.show()
+
+        self.thr2 = Thread_load_guards_inf_urgences(self.num_days, self.month, self.year)
+        self.thr2._signal.connect(self.signal_accepted_load_inf)
+        self.thr2._signal_status.connect(self.signal_accepted_load_inf)
+        self.thr2._signal_finish.connect(self.signal_accepted_load_inf)
+        self.thr2.start()
+
+    def signal_accepted_load_inf(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+
+            row = progress[0]
+            results_light = progress[1]
+            results_night = progress[2]
+
+            day = row + 1
+            x = datetime.datetime(self.year, self.month, day)
+            m = ""
+            if x.strftime("%A") == "Saturday":
+                m = "Samedi"
+            elif x.strftime("%A") == "Sunday":
+                m = "Dimanche"
+            elif x.strftime("%A") == "Monday":
+                m = "Lundi"
+            elif x.strftime("%A") == "Tuesday":
+                m = "Mardi"
+            elif x.strftime("%A") == "Wednesday":
+                m = "Mercredi"
+            elif x.strftime("%A") == "Thursday":
+                m = "Jeudi"
+            elif x.strftime("%A") == "Friday":
+                m = "Vendredi"
+
+            self.table.setRowHeight(row, 50)
+            self.table.setItem(row, 0, QTableWidgetItem(m))
+            self.table.setItem(row, 1, QTableWidgetItem(str(day) + "/" + str(self.month) + "/" + str(self.year)))
+            chose_light = Chose_worker(self.medcins)
+            chose_night = Chose_worker(self.medcins)
+
+            if results_light:
+                print(results_light)
+                rl = results_light[0]
+                chose_light.chose.setCurrentText(str(rl[0]))
+            if results_night:
+                print(results_night)
+                rn = results_night[0]
+                chose_night.chose.setCurrentText(str(rn[0]))
+
+            self.table.setCellWidget(row, 2, chose_light)
+            self.table.setCellWidget(row, 3, chose_night)
+
+        elif type(progress) == bool:
+            self.dialog.progress.setValue(100)
+            self.dialog.ttl.setText("complete")
+            self.dialog.close()
+
+    def load_guards_surv(self):
+        self.dialog = Threading_loading()
+        self.dialog.ttl.setText("إنتظر من فضلك")
+        self.dialog.progress.setValue(0)
+        self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.dialog.show()
+
+        self.thr2 = Thread_load_guards_inf_urgences(self.num_days, self.month, self.year)
+        self.thr2._signal.connect(self.signal_accepted_load_surv)
+        self.thr2._signal_status.connect(self.signal_accepted_load_surv)
+        self.thr2._signal_finish.connect(self.signal_accepted_load_surv)
+        self.thr2.start()
+
+    def signal_accepted_load_surv(self, progress):
+        if type(progress) == int:
+            self.dialog.progress.setValue(progress)
+        elif type(progress) == list:
+
+            row = progress[0]
+            results_light = progress[1]
+            results_night = progress[2]
+
+            day = row + 1
+            x = datetime.datetime(self.year, self.month, day)
+            m = ""
+            if x.strftime("%A") == "Saturday":
+                m = "Samedi"
+            elif x.strftime("%A") == "Sunday":
+                m = "Dimanche"
+            elif x.strftime("%A") == "Monday":
+                m = "Lundi"
+            elif x.strftime("%A") == "Tuesday":
+                m = "Mardi"
+            elif x.strftime("%A") == "Wednesday":
+                m = "Mercredi"
+            elif x.strftime("%A") == "Thursday":
+                m = "Jeudi"
+            elif x.strftime("%A") == "Friday":
+                m = "Vendredi"
+
+            self.table.setRowHeight(row, 50)
+            self.table.setItem(row, 0, QTableWidgetItem(m))
+            self.table.setItem(row, 1, QTableWidgetItem(str(day) + "/" + str(self.month) + "/" + str(self.year)))
+            chose_light = Chose_worker(self.medcins)
+            chose_night = Chose_worker(self.medcins)
+
+            if results_light:
+                print(results_light)
+                rl = results_light[0]
+                chose_light.chose.setCurrentText(str(rl[0]))
+            if results_night:
+                print(results_night)
+                rn = results_night[0]
+                chose_night.chose.setCurrentText(str(rn[0]))
+
+            self.table.setCellWidget(row, 2, chose_light)
+            self.table.setCellWidget(row, 3, chose_night)
+
+        elif type(progress) == bool:
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("complete")
             self.dialog.close()
