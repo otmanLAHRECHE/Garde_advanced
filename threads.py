@@ -1327,11 +1327,11 @@ class ThreadAddGroupe(QThread):
         connection = sqlite3.connect("database/sqlite.db")
         cur = connection.cursor()
         sql_q = "INSERT INTO health_worker (full_name,service) values (?,?)"
-        cur.execute(sql_q, (self.name, "urgence_inf"))
+        cur.execute(sql_q, (self.name, "inf"))
 
         connection.commit()
 
-        id_inf = get_workerId_by_name(self.name, "urgence_inf")
+        id_inf = get_workerId_by_name(self.name, "inf")
         id_inf = id_inf[0]
 
         sql_q = "INSERT INTO groupe (g,inf_id) values (?,?)"
@@ -1735,11 +1735,11 @@ class ThreadAddGroupeSurv(QThread):
         connection = sqlite3.connect("database/sqlite.db")
         cur = connection.cursor()
         sql_q = "INSERT INTO health_worker (full_name,service) values (?,?)"
-        cur.execute(sql_q, (self.name, "urgence_surv"))
+        cur.execute(sql_q, (self.name, "surv"))
 
         connection.commit()
 
-        id_inf = get_workerId_by_name(self.name, "urgence_surv")
+        id_inf = get_workerId_by_name(self.name, "surv")
         id_inf = id_inf[0]
 
         sql_q = "INSERT INTO groupe_surv (g,inf_id) values (?,?)"
