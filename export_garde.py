@@ -5,7 +5,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 import app
-from threads import ThreadGuard
+from threads import ThreadGuard, ThreadGuardUrgenceInf, ThreadGuardUrgenceSurv
 from tools import create_garde_page, create_garde_inf_page
 
 
@@ -89,10 +89,22 @@ class ExportGardeUi(QtWidgets.QMainWindow):
         elif self.service == "pharm":
             self.ttl.setText("Imprimer planing de garde pharmacie mois " + str(m) + "/" + str(self.year) + ":")
 
-        self.thr = ThreadGuard(self.service, self.num_days, self.month, self.year)
-        self.thr._signal.connect(self.signal_accept)
-        self.thr._signal_result.connect(self.signal_accept)
-        self.thr.start()
+        if self.service == "inf":
+            self.thr = ThreadGuardUrgenceInf(self.num_days, self.month, self.year)
+            self.thr._signal.connect(self.signal_accept)
+            self.thr._signal_result.connect(self.signal_accept)
+            self.thr._signal_groupes.connect(self.signal_accept_groupes)
+            self.thr.start()
+        elif self.service == "surv":
+            self.thr = ThreadGuardUrgenceSurv(self.num_days, self.month, self.year)
+            self.thr._signal.connect(self.signal_accept)
+            self.thr._signal_result.connect(self.signal_accept)
+            self.thr._signal_groupes.connect(self.signal_accept_groupes)
+        else:
+            self.thr = ThreadGuard(self.service, self.num_days, self.month, self.year)
+            self.thr._signal.connect(self.signal_accept)
+            self.thr._signal_result.connect(self.signal_accept)
+            self.thr.start()
 
     def export_pdf(self):
         print(self.data)
@@ -126,6 +138,10 @@ class ExportGardeUi(QtWidgets.QMainWindow):
             self.data = progress
             self.status.setText("complete, click sur exporter")
             self.export.setEnabled(True)
+
+    def signal_accept_groupes(self, progress):
+        if type(progress) == list:
+            self.groupes = progress
 
     def alert_(self, message):
         alert = QMessageBox()

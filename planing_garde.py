@@ -36,6 +36,8 @@ class GuardUi(QtWidgets.QMainWindow):
         self.exportPd.setIcon(QIcon("./asstes/images/download.png"))
         self.auto = self.findChild(QtWidgets.QPushButton, "pushButton_3")
         self.auto.setIcon(QIcon("./asstes/images/auto.png"))
+        self.auto_plus = self.findChild(QtWidgets.QPushButton, "pushButton_4")
+        self.auto_plus.setIcon(QIcon("./asstes/images/auto.png"))
         self.table.setColumnWidth(2, 220)
         self.table.setColumnWidth(3, 220)
 
@@ -123,6 +125,7 @@ class GuardUi(QtWidgets.QMainWindow):
 
         self.save.clicked.connect(self.save_)
         self.auto.clicked.connect(self.auto_)
+        self.auto_plus.clicked.connect(self.auto_plus_)
 
     def load_guards(self):
         self.dialog = Threading_loading()
@@ -228,7 +231,7 @@ class GuardUi(QtWidgets.QMainWindow):
             chose_light = Chose_worker(self.medcins)
             chose_night = Chose_worker(self.medcins)
 
-            if self.service == "inf" or  self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf" or self.service == "dentiste":
+            if self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf" or self.service == "dentiste":
                 if m in self.days_of_week:
                     if results_light:
                         rl = results_light[0]
@@ -316,7 +319,7 @@ class GuardUi(QtWidgets.QMainWindow):
                     progress[0], 0).text() == "Mardi" or self.table.item(progress[0],
                                                                          0).text() == "Mercredi" or self.table.item(
                     progress[0], 0).text() == "Jeudi":
-                if self.service == "inf" or self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf":
+                if self.service == "admin" or self.service == "pharm" or self.service == "dentiste_inf" or self.service == "dentiste":
                     chose_night.chose.setCurrentIndex(progress[2])
                     self.table.setCellWidget(progress[0], 3, chose_night)
                 else:
@@ -476,3 +479,6 @@ class GuardUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("complete")
             self.dialog.close()
+
+
+    def auto_plus_(self):

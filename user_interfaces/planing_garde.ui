@@ -329,6 +329,22 @@
      <string>Save</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_4">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>110</y>
+      <width>81</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(199, 238, 255);</string>
+    </property>
+    <property name="text">
+     <string>auto++</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
