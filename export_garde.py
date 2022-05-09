@@ -100,6 +100,7 @@ class ExportGardeUi(QtWidgets.QMainWindow):
             self.thr._signal.connect(self.signal_accept)
             self.thr._signal_result.connect(self.signal_accept)
             self.thr._signal_groupes.connect(self.signal_accept_groupes)
+            self.thr.start()
         else:
             self.thr = ThreadGuard(self.service, self.num_days, self.month, self.year)
             self.thr._signal.connect(self.signal_accept)
@@ -118,17 +119,10 @@ class ExportGardeUi(QtWidgets.QMainWindow):
         else:
             if not self.service == "inf" and not self.service == "surv":
                 create_garde_page(self.service,  self.month, self.year, self.data, filePath)
-                self.next_page = app.AppUi(self.service)
-                self.next_page.show()
                 self.close()
             else:
-                create_garde_inf_page(self.service,  self.month, self.year, self.data,
-                                      self.groupes, filePath)
-                self.next_page = app.AppUi(self.service)
-                self.next_page.show()
+                create_garde_inf_page(self.service, self.month, self.year, self.data, self.groupes, filePath)
                 self.close()
-
-
 
     def signal_accept(self, progress):
         if type(progress) == int:

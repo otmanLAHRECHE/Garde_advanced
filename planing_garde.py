@@ -15,7 +15,7 @@ from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
 import os
 
 from threads import Thread_load_guards, Thread_create_guard, ThreadAutoGuard, Thread_load_guards_inf_urgences, \
-    Thread_create_urgence_inf_guard, Thread_create_urgence_surv_guard
+    Thread_create_urgence_inf_guard, Thread_create_urgence_surv_guard, Thread_load_guards_surv_urgences
 from widgets import Chose_worker
 
 
@@ -38,6 +38,7 @@ class GuardUi(QtWidgets.QMainWindow):
         self.auto.setIcon(QIcon("./asstes/images/auto.png"))
         self.auto_plus = self.findChild(QtWidgets.QPushButton, "pushButton_4")
         self.auto_plus.setIcon(QIcon("./asstes/images/auto.png"))
+        self.table.setColumnWidth(1, 70)
         self.table.setColumnWidth(2, 220)
         self.table.setColumnWidth(3, 220)
 
@@ -157,12 +158,12 @@ class GuardUi(QtWidgets.QMainWindow):
         self.dialog.show()
 
         if self.service == "inf" :
-            self.thr = Thread_create_urgence_inf_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr = Thread_create_urgence_inf_guard(self.num_days, self.month, self.year, self.table)
             self.thr._signal.connect(self.signal_accepted)
             self.thr._signal_status.connect(self.signal_accepted)
             self.thr.start()
         elif self.service == "surv":
-            self.thr = Thread_create_urgence_surv_guard(self.service, self.num_days, self.month, self.year, self.table)
+            self.thr = Thread_create_urgence_surv_guard(self.num_days, self.month, self.year, self.table)
             self.thr._signal.connect(self.signal_accepted)
             self.thr._signal_status.connect(self.signal_accepted)
             self.thr.start()
@@ -173,23 +174,19 @@ class GuardUi(QtWidgets.QMainWindow):
             self.thr.start()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        message = "Votre liste de garde na pas sauvgarder, es-tu sûr de quiter"
+        message = "Es-tu sûr de quiter?"
         dialog = CustomDialog(message)
-        if not self.want_to_close:
-            if dialog.exec():
-                if self.service == "inf" or self.service == "surv":
-                    self.next_page = app_inf_urgence.AppInfUi(self.service)
-                    self.next_page.show()
-                    self.close()
-                else:
-                    self.next_page = app.AppUi(self.service)
-                    self.next_page.show()
-                    self.close()
-
+        if dialog.exec():
+            if self.service == "inf" or self.service == "surv":
+                self.next_page = app_inf_urgence.AppInfUi("inf")
+                self.next_page.show()
+                self.close()
             else:
-                a0.ignore()
+                self.next_page = app.AppUi(self.service)
+                self.next_page.show()
+                self.close()
         else:
-            self.close()
+            a0.ignore()
 
     def signal_accepted(self, progress):
         if type(progress) == int:
@@ -265,10 +262,18 @@ class GuardUi(QtWidgets.QMainWindow):
             self.dialog.close()
 
     def export(self):
-        self.want_to_close = True
-        self.next_page = export_garde.ExportGardeUi(self.service, self.month, self.year)
-        self.close()
-        self.next_page.show()
+        if self.service == "inf":
+            self.want_to_close = True
+            self.next_page = export_garde.ExportGardeUi("inf", self.month, self.year)
+            self.next_page.show()
+        elif self.service == "surv":
+            self.want_to_close = True
+            self.next_page = export_garde.ExportGardeUi("surv", self.month, self.year)
+            self.next_page.show()
+        else:
+            self.want_to_close = True
+            self.next_page = export_garde.ExportGardeUi(self.service, self.month, self.year)
+            self.next_page.show()
 
     def auto_(self):
         auto = []
@@ -424,7 +429,7 @@ class GuardUi(QtWidgets.QMainWindow):
         self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.dialog.show()
 
-        self.thr2 = Thread_load_guards_inf_urgences(self.num_days, self.month, self.year)
+        self.thr2 = Thread_load_guards_surv_urgences(self.num_days, self.month, self.year)
         self.thr2._signal.connect(self.signal_accepted_load_surv)
         self.thr2._signal_status.connect(self.signal_accepted_load_surv)
         self.thr2._signal_finish.connect(self.signal_accepted_load_surv)
@@ -482,3 +487,4 @@ class GuardUi(QtWidgets.QMainWindow):
 
 
     def auto_plus_(self):
+        print("ok")

@@ -601,7 +601,7 @@ class ThreadAutoGuard(QThread):
             list.append(results_night)
 
             self._signal.emit(list)
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         self._signal_result.emit(True)
@@ -984,7 +984,7 @@ class Thread_state_load(QThread):
         list.append(self.ECG)
 
         for prog in range(20):
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         print(list)
@@ -1088,7 +1088,7 @@ class Thread_save_state(QThread):
             connection.commit()
 
         for prog in range(20):
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         connection.close()
@@ -1232,28 +1232,24 @@ class ThreadStateExport(QThread):
         total = self.Poumon[0] + self.Poumon[1] + self.Poumon[2]
         data_examen = ("Poumon", self.Poumon[0], self.Poumon[1], self.Poumon[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.OS[0] + self.OS[1] + self.OS[2]
         data_examen = ("OS", self.OS[0], self.OS[1], self.OS[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.Abdomen_simple[0] + self.Abdomen_simple[1] + self.Abdomen_simple[2]
         data_examen = ("Abdomen simple", self.Abdomen_simple[0], self.Abdomen_simple[1], self.Abdomen_simple[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.UIV[0] + self.UIV[1] + self.UIV[2]
         data_examen = ("U.I.V", self.UIV[0], self.UIV[1], self.UIV[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
@@ -1261,35 +1257,30 @@ class ThreadStateExport(QThread):
         data_examen = (
             "Cholecystographie", self.Cholecystographie[0], self.Cholecystographie[1], self.Cholecystographie[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.Estomac[0] + self.Estomac[1] + self.Estomac[2]
         data_examen = ("Estomac", self.Estomac[0], self.Estomac[1], self.Estomac[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.Echographie[0] + self.Echographie[1] + self.Echographie[2]
         data_examen = ("Echographie", self.Echographie[0], self.Echographie[1], self.Echographie[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.Fibroscopie[0] + self.Fibroscopie[1] + self.Fibroscopie[2]
         data_examen = ("Fibroscopie", self.Fibroscopie[0], self.Fibroscopie[1], self.Fibroscopie[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
         total = self.ECG[0] + self.ECG[1] + self.ECG[2]
         data_examen = ("E.C.G", self.ECG[0], self.ECG[1], self.ECG[2], total)
         self.data.append(data_examen)
-        time.sleep(0.2)
         self._signal.emit(int(prog))
         prog = prog + 1
 
@@ -1342,7 +1333,7 @@ class ThreadAddGroupe(QThread):
 
         for n in range(20):
             self._signal.emit(n)
-            time.sleep(0.1)
+            time.sleep(0.025)
 
         self._signal_result.emit(True)
 
@@ -1384,7 +1375,7 @@ class ThreadUpdateGroupe(QThread):
 
         for n in range(20):
             self._signal.emit(n)
-            time.sleep(0.1)
+            time.sleep(0.025)
 
         self._signal_result.emit(True)
 
@@ -1465,7 +1456,7 @@ class ThreadGuardUrgenceInf(QThread):
 
             self.data.append(data_day)
 
-            time.sleep(0.3)
+            time.sleep(0.025)
             self._signal.emit(int(prog))
 
         print(self.data)
@@ -1667,7 +1658,7 @@ class Thread_create_urgence_inf_guard(QThread):
                     cur.execute(sql_q_light, (day, self.month, self.year, 'night', id))
 
             connection.commit()
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         connection.close()
@@ -1711,7 +1702,7 @@ class Thread_load_guards_inf_urgences(QThread):
             list.append(results_night)
 
             self._signal.emit(list)
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         connection.close()
@@ -1750,7 +1741,7 @@ class ThreadAddGroupeSurv(QThread):
 
         for n in range(20):
             self._signal.emit(n)
-            time.sleep(0.1)
+            time.sleep(0.025)
 
         self._signal_result.emit(True)
 
@@ -1792,7 +1783,7 @@ class ThreadUpdateGroupeSurv(QThread):
 
         for n in range(20):
             self._signal.emit(n)
-            time.sleep(0.1)
+            time.sleep(0.025)
 
         self._signal_result.emit(True)
 
@@ -1873,7 +1864,7 @@ class ThreadGuardUrgenceSurv(QThread):
 
             self.data.append(data_day)
 
-            time.sleep(0.3)
+            time.sleep(0.025)
             self._signal.emit(int(prog))
 
         print(self.data)
@@ -2119,7 +2110,7 @@ class Thread_load_guards_surv_urgences(QThread):
             list.append(results_night)
 
             self._signal.emit(list)
-            time.sleep(0.1)
+            time.sleep(0.025)
             self._signal_status.emit(int(prog))
 
         connection.close()

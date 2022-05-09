@@ -328,7 +328,7 @@ class AppInfUi(QtWidgets.QMainWindow):
     def delete_worker_inf(self):
         ch = 0
         for row in range(self.table_workers_inf.rowCount()):
-            if self.table_workers_surv.cellWidget(row, 1).check.isChecked():
+            if self.table_workers_inf.cellWidget(row, 1).check.isChecked():
                 row_selected = row
                 ch = ch + 1
         if ch > 1 or ch == 0:
@@ -337,7 +337,7 @@ class AppInfUi(QtWidgets.QMainWindow):
                 self.table_workers_inf.cellWidget(row, 1).check.setChecked(False)
         else:
             delete_worker(int(self.table_workers_inf.item(row_selected, 0).text()))
-            delete_group_inf(int(self.table_workers_surv.item(row_selected, 0).text()))
+            delete_group_inf(int(self.table_workers_inf.item(row_selected, 0).text()))
             self.table_workers_inf.removeRow(row_selected)
             self.table_workers_inf.removeRow(0)
             self.load_workers_all()
@@ -521,7 +521,7 @@ class AppInfUi(QtWidgets.QMainWindow):
         if ch > 1 or ch == 0:
             self.alert_("selectioner just un mois")
             for row in range(self.table_gardes.rowCount()):
-                self.table_workers.cellWidget(row, 1).check.setChecked(False)
+                self.table_gardes.cellWidget(row, 1).check.setChecked(False)
         else:
             m = self.table_gardes.item(row_selected, 2).text()
             y = self.table_gardes.item(row_selected, 3).text()

@@ -236,7 +236,7 @@ def create_recap_page(service, rec, month, year, data, chef, path):
     pdf.output(path)
 
 
-def create_garde_inf_page(service, grd_cons, month, year, data, groupes, path):
+def create_garde_inf_page(service, month, year, data, groupes, path):
     pdf = EpspPdf()
     pdf.alias_nb_pages()
     pdf.add_page()
