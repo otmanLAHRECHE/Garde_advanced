@@ -81,3 +81,25 @@ class Add_new_inf(QtWidgets.QDialog):
         self.ttl = self.findChild(QtWidgets.QLabel, "label")
         self.groupe = self.findChild(QtWidgets.QComboBox, "comboBox")
         self.nom = self.findChild(QtWidgets.QLineEdit, "lineEdit")
+
+class Auto_plus(QtWidgets.QDialog):
+    def __init__(self):
+        super(Auto_plus, self).__init__()
+        uic.loadUi("./user_interfaces/auto_plus.ui", self)
+
+        self.setWindowTitle("auto garde")
+        self.agent = self.findChild(QtWidgets.QComboBox, "comboBox")
+        self.add_agent = self.findChild(QtWidgets.QPushButton, "pushButton")
+        self.empty_list_agents = self.findChild(QtWidgets.QPushButton, "pushButton_3")
+        self.radio_all = self.findChild(QtWidgets.QRadioButton, "radioButton_2")
+        self.radio_periode = self.findChild(QtWidgets.QRadioButton, "radioButton")
+        self.start_day = self.findChild(QtWidgets.QSpinBox, "spinBox")
+        self.end_day = self.findChild(QtWidgets.QSpinBox, "spinBox_2")
+        self.start_time = self.findChild(QtWidgets.QComboBox, "comboBox_2")
+        self.end_time = self.findChild(QtWidgets.QComboBox, "comboBox_3")
+        self.jour_fr = self.findChild(QtWidgets.QSpinBox, "spinBox_3")
+        self.add_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_2")
+        self.empty_list_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_4")
+        self.classement = self.findChild(QtWidgets.QListView, "listView")
+        self.list_jour_fr = self.findChild(QtWidgets.QListView, "listView_2")
+
