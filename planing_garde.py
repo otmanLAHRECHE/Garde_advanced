@@ -4,13 +4,13 @@ import sqlite3
 from PyQt5 import QtWidgets, uic, QtGui, Qt, QtCore
 from calendar import monthrange
 
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QTableWidgetItem, qApp, QMessageBox
 
 import app
 import app_inf_urgence
 import export_garde
-from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading
+from dialogs import CustomDialog, Saving_progress_dialog, Threading_loading, Auto_plus
 
 import os
 
@@ -35,7 +35,7 @@ class GuardUi(QtWidgets.QMainWindow):
         self.exportPd = self.findChild(QtWidgets.QPushButton, "pushButton_2")
         self.exportPd.setIcon(QIcon("./asstes/images/download.png"))
         self.auto = self.findChild(QtWidgets.QPushButton, "pushButton_3")
-        self.auto.setIcon(QIcon("./asstes/images/auto.png"))
+        self.auto.setIcon(QIcon("./icons/refresh-ccw.png"))
         self.auto_plus = self.findChild(QtWidgets.QPushButton, "pushButton_4")
         self.auto_plus.setIcon(QIcon("./asstes/images/auto.png"))
         self.table.setColumnWidth(1, 70)
@@ -80,6 +80,7 @@ class GuardUi(QtWidgets.QMainWindow):
 
         if self.service == "urgence":
             self.ttl.setText("Planing de garde urgence mois " + str(m) + "/" + str(self.year) + ":")
+            self.auto_plus.setEnabled(False)
             self.load_med()
             self.load_guards()
 
@@ -90,11 +91,15 @@ class GuardUi(QtWidgets.QMainWindow):
 
         elif self.service == "labo":
             self.ttl.setText("Planing de garde laboratoire mois " + str(m) + "/" + str(self.year) + ":")
+            self.auto_plus.setEnabled(False)
             self.load_med()
             self.load_guards()
 
         elif self.service == "radio":
             self.ttl.setText("Planing de garde radiologie mois " + str(m) + "/" + str(self.year) + ":")
+            self.auto_plus.setEnabled(False)
+            self.load_med()
+            self.load_guards()
 
         elif self.service == "admin":
             self.ttl.setText("Planing de garde administration mois " + str(m) + "/" + str(self.year) + ":")
@@ -108,11 +113,13 @@ class GuardUi(QtWidgets.QMainWindow):
 
         elif self.service == "inf":
             self.ttl.setText("Planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
+            self.auto_plus.setEnabled(False)
             self.load_groups_inf()
             self.load_guards_inf()
 
         elif self.service == "surv":
             self.ttl.setText("Planing de garde surveillants d'urgences mois " + str(m) + "/" + str(self.year) + ":")
+            self.auto_plus.setEnabled(False)
             self.load_groups_surv()
             self.load_guards_surv()
 
@@ -235,6 +242,7 @@ class GuardUi(QtWidgets.QMainWindow):
                         chose_light.chose.setCurrentText(str(rl[0]))
                     else:
                         chose_light.chose.setEnabled(False)
+                        chose_light.setStyleSheet("background-color: rgb(162, 153, 153);")
                 else:
                     if results_light:
                         rl = results_light[0]
@@ -275,34 +283,16 @@ class GuardUi(QtWidgets.QMainWindow):
             self.next_page = export_garde.ExportGardeUi(self.service, self.month, self.year)
             self.next_page.show()
 
+
+
     def auto_(self):
-        auto = []
-        for i in range(16):
-            check1 = self.table.cellWidget(i, 2)
-            check2 = self.table.cellWidget(i, 3)
-            medInd1 = check1.chose.currentIndex()
-            medInd2 = check2.chose.currentIndex()
-            if medInd1 != 0:
-                auto.append(medInd1)
-            if medInd2 != 0:
-                auto.append(medInd2)
-
-
-        if len(auto) == 0:
-            message = "liste vide"
-            self.alert_(message)
-        else:
-            self.dialog = Threading_loading()
-            self.dialog.ttl.setText("إنتظر من فضلك")
-            self.dialog.progress.setValue(0)
-            self.dialog.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-            self.dialog.show()
-
-            self.thr3 = ThreadAutoGuard(self.num_days, self.month, self.year, self.service, self.table, auto)
-            self.thr3._signal.connect(self.signal_accepted_auto)
-            self.thr3._signal_status.connect(self.signal_accepted_auto)
-            self.thr3._signal_result.connect(self.signal_accepted_auto)
-            self.thr3.start()
+        try:
+            for i in range(self.table.rowCount()):
+                if self.table.cellWidget(i, 2).isEnabled():
+                    self.table.cellWidget(i, 2).chose.setCurrentIndex(0)
+                self.table.cellWidget(i, 3).chose.setCurrentIndex(0)
+        except Exception:
+            print(Exception.args)
 
 
     def alert_(self, message):
@@ -487,4 +477,43 @@ class GuardUi(QtWidgets.QMainWindow):
 
 
     def auto_plus_(self):
-        print("ok")
+        dialog = Auto_plus(self.num_days, self.month, self.medcins)
+        list_med = []
+        jf = []
+        if dialog.exec() == QtWidgets.QDialog.Accepted:
+            print("ok")
+            if dialog.classement.count() != 0:
+                for i in range(dialog.classement.count()):
+                    list_med.append(dialog.classement.item(i).text())
+
+
+            if dialog.list_jour_fr.count() != 0:
+                for i in range(dialog.list_jour_fr.count()):
+                    jf.append(dialog.list_jour_fr.item(i).text())
+
+            for j in jf:
+                jj = j.split(" ")
+                jj = jj[0]
+
+                chose_light = Chose_worker(self.medcins)
+                self.table.removeCellWidget(int(jj)-1, 2)
+                self.table.setCellWidget(int(jj)-1, 2, chose_light)
+                self.table.cellWidget(int(jj)-1, 2).setStyleSheet("background-color: rgb(199, 238, 255);")
+
+            if len(list_med) == 0:
+
+            else:
+                index = 0
+                if dialog.radio_all.isChecked():
+                    days = self.num_days
+
+                    for day in self.num_days:
+                        row = day - 1
+                        if index < len(list_med):
+                            self.table.cellWidget(row, 2).se
+
+                else:
+                    st = int(dialog.start_day.text())
+                    en = int(dialog.end_day.text())
+
+

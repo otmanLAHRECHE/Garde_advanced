@@ -108,19 +108,6 @@
     <string notr="true">background-color: rgb(5, 122, 185);</string>
    </property>
   </widget>
-  <widget class="QListView" name="listView">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>91</y>
-     <width>261</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(199, 238, 255);</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comboBox">
    <property name="geometry">
     <rect>
@@ -278,6 +265,9 @@
    </property>
    <property name="text">
     <string>Tout le mois</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">
@@ -446,19 +436,6 @@
     <string>Jours fériés:</string>
    </property>
   </widget>
-  <widget class="QListView" name="listView_2">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>280</y>
-     <width>261</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(199, 238, 255);</string>
-   </property>
-  </widget>
   <widget class="QSpinBox" name="spinBox_3">
    <property name="geometry">
     <rect>
@@ -467,6 +444,12 @@
      <width>71</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>31</number>
    </property>
   </widget>
   <widget class="QLabel" name="label_9">
@@ -521,6 +504,32 @@
    </property>
    <property name="text">
     <string>Vider</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>90</y>
+     <width>251</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(199, 238, 255);</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>270</y>
+     <width>256</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(199, 238, 255);</string>
    </property>
   </widget>
  </widget>

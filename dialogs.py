@@ -83,9 +83,11 @@ class Add_new_inf(QtWidgets.QDialog):
         self.nom = self.findChild(QtWidgets.QLineEdit, "lineEdit")
 
 class Auto_plus(QtWidgets.QDialog):
-    def __init__(self):
+    def __init__(self, num_days, mois, medecins):
         super(Auto_plus, self).__init__()
         uic.loadUi("./user_interfaces/auto_plus.ui", self)
+
+        self.month = mois
 
         self.setWindowTitle("auto garde")
         self.agent = self.findChild(QtWidgets.QComboBox, "comboBox")
@@ -100,6 +102,80 @@ class Auto_plus(QtWidgets.QDialog):
         self.jour_fr = self.findChild(QtWidgets.QSpinBox, "spinBox_3")
         self.add_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_2")
         self.empty_list_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_4")
-        self.classement = self.findChild(QtWidgets.QListView, "listView")
-        self.list_jour_fr = self.findChild(QtWidgets.QListView, "listView_2")
+        self.classement = self.findChild(QtWidgets.QListWidget, "listWidget")
+        self.list_jour_fr = self.findChild(QtWidgets.QListWidget, "listWidget_2")
+
+        self.add_agent.clicked.connect(self.add_to_classemnt)
+        self.empty_list_agents.clicked.connect(self.empty_classement)
+
+        self.add_jour_fr.clicked.connect(self.add_day_fr)
+        self.empty_list_jour_fr.clicked.connect(self.empty_day_fr)
+
+        self.radio_all.setChecked(True)
+        self.start_day.setEnabled(False)
+        self.start_time.setEnabled(False)
+        self.end_day.setEnabled(False)
+        self.end_time.setEnabled(False)
+
+        self.radio_all.toggled.connect(self.radio_all_toggled)
+        self.radio_periode.toggled.connect(self.radio_periode_toggled)
+
+        for i in medecins:
+            self.agent.addItem(i[0])
+
+
+    def radio_all_toggled(self, selected):
+        if selected:
+            self.start_day.setEnabled(False)
+            self.start_time.setEnabled(False)
+            self.end_day.setEnabled(False)
+            self.end_time.setEnabled(False)
+
+    def radio_periode_toggled(self, selected):
+        if selected:
+            self.start_day.setEnabled(True)
+            self.start_time.setEnabled(True)
+            self.end_day.setEnabled(True)
+            self.end_time.setEnabled(True)
+
+
+    def add_to_classemnt(self):
+        self.classement.addItem(self.agent.currentText())
+
+    def empty_classement(self):
+        self.classement.clear()
+
+    def add_day_fr(self):
+        if self.month == 1:
+            m = "janvier"
+        elif self.month == 2:
+            m = "février"
+        elif self.month == 3:
+            m = "mars"
+        elif self.month == 4:
+            m = "avril"
+        elif self.month == 5:
+            m = "mai"
+        elif self.month == 6:
+            m = "juin"
+        elif self.month == 7:
+            m = "juillet"
+        elif self.month == 8:
+            m = "août"
+        elif self.month == 9:
+            m = "septembre"
+        elif self.month == 10:
+            m = "octobre"
+        elif self.month == 11:
+            m = "novembre"
+        elif self.month == 12:
+            m = "décembre"
+        self.list_jour_fr.addItem(str(self.jour_fr.value())+" "+m)
+
+
+
+    def empty_day_fr(self):
+        self.list_jour_fr.clear()
+
+
 

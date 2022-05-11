@@ -13,4 +13,6 @@ class Chose_worker(QWidget):
             self.chose.addItem(worker[0])
         widget.addWidget(self.chose)
 
+
+
         self.setLayout(widget)

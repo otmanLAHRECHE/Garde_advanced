@@ -130,8 +130,9 @@ class ExportGardeUi(QtWidgets.QMainWindow):
         elif type(progress) == list:
             self.progress.setValue(100)
             self.data = progress
-            self.status.setText("complete, click sur exporter")
+            self.status.setText("complete")
             self.export.setEnabled(True)
+            self.preview.setEnabled(True)
 
     def signal_accept_groupes(self, progress):
         if type(progress) == list:

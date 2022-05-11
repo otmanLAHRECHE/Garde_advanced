@@ -294,7 +294,7 @@
      <string notr="true">background-color: rgb(199, 238, 255);</string>
     </property>
     <property name="text">
-     <string>auto</string>
+     <string>resete</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
@@ -342,7 +342,7 @@
      <string notr="true">background-color: rgb(199, 238, 255);</string>
     </property>
     <property name="text">
-     <string>auto++</string>
+     <string>auto</string>
     </property>
    </widget>
   </widget>
