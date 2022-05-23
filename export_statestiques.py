@@ -80,9 +80,6 @@ class ExportStatistiqueUi(QtWidgets.QMainWindow):
             self.alert_(message)
         else:
             create_statistique_page(self.month, self.year, self.data, filePath)
-            self.next_page = app.AppUi("radio")
-            self.next_page.show()
-            print(self.thr.isFinished())
             self.close()
 
 

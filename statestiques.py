@@ -66,15 +66,12 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         message = "Votre radio statistiques na pas sauvgarder, es-tu sûr de quiter"
         dialog = CustomDialog(message)
-        if not self.want_to_close:
-            if dialog.exec():
-                self.next_page = app.AppUi("radio")
-                self.next_page.show()
-                self.close()
-            else:
-                a0.ignore()
-        else:
+        if dialog.exec():
+            self.next_page = app.AppUi("radio")
+            self.next_page.show()
             self.close()
+        else:
+            a0.ignore()
 
     def load_state(self):
         self.dialog = Threading_loading()
@@ -215,7 +212,6 @@ class RadioStatistiquesUi(QtWidgets.QMainWindow):
         self.want_to_close = True
         self.next_page = export_statestiques.ExportStatistiqueUi(self.month, self.year)
         self.next_page.show()
-        self.close()
 
 
 

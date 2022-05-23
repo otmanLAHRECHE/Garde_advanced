@@ -121,10 +121,6 @@ class ExportRecapUi(QtWidgets.QMainWindow):
 
 
             create_recap_page(s, r, self.month, self.year, self.data, self.chef, filePath)
-
-
-            self.next_page = app.AppUi(self.service)
-            self.next_page.show()
             self.close()
 
 

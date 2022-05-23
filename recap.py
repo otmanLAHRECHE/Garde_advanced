@@ -97,15 +97,13 @@ class RecapUi(QtWidgets.QMainWindow):
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         message = "Votre liste de RECAP na pas sauvgarder, es-tu sûr de quiter"
         dialog = CustomDialog(message)
-        if not self.want_to_close:
-            if dialog.exec():
-                self.next_page = app.AppUi(self.service)
-                self.next_page.show()
-                self.close()
-            else:
-                a0.ignore()
-        else:
+        if dialog.exec():
+            self.next_page = app.AppUi(self.service)
+            self.next_page.show()
             self.close()
+        else:
+            a0.ignore()
+
 
     def load_recap(self):
         self.dialog = Threading_loading()
@@ -179,7 +177,6 @@ class RecapUi(QtWidgets.QMainWindow):
 
         self.next_page = export_recap.ExportRecapUi(self.month, self.year, self.service, self.chef.currentText())
         self.next_page.show()
-        self.close()
 
     def signal_accepted_save(self, progress):
         if type(progress) == int:
