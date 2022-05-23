@@ -112,9 +112,7 @@ class Auto_plus(QtWidgets.QDialog):
 
         self.radio_all.setChecked(True)
         self.start_day.setEnabled(False)
-        self.start_time.setEnabled(False)
         self.end_day.setEnabled(False)
-        self.end_time.setEnabled(False)
 
         self.radio_all.toggled.connect(self.radio_all_toggled)
         self.radio_periode.toggled.connect(self.radio_periode_toggled)
