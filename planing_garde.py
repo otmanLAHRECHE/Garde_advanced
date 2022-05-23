@@ -501,16 +501,24 @@ class GuardUi(QtWidgets.QMainWindow):
                 self.table.cellWidget(int(jj)-1, 2).setStyleSheet("background-color: rgb(199, 238, 255);")
 
             if len(list_med) == 0:
-
+                self.alert_("liste des travailleurs est vide")
             else:
                 index = 0
                 if dialog.radio_all.isChecked():
                     days = self.num_days
 
-                    for day in self.num_days:
+                    for day in range(days):
                         row = day - 1
                         if index < len(list_med):
-                            self.table.cellWidget(row, 2).se
+                            self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
+                            if index == len(list_med) - 1:
+                                index = 0
+                            else:
+                                index = index + 1
+                            self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+
+                        else:
+                            print("ok")
 
                 else:
                     st = int(dialog.start_day.text())
