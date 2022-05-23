@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
 import app
 import export_recap
+from database_operations import load_workers
 from dialogs import CustomDialog, Threading_loading
 from threads import Thread_save_recap, Thread_recap_load
 
@@ -31,6 +32,10 @@ class RecapUi(QtWidgets.QMainWindow):
         self.export = self.findChild(QtWidgets.QPushButton, "pushButton_2")
         self.export.setIcon(QIcon("asstes/images/download.png"))
         self.export.setEnabled(False)
+        self.add_barka = self.findChild(QtWidgets.QPushButton, "pushButton_3")
+        self.add_barka.setEnabled(False)
+        self.add_barka_combo = self.findChild(QtWidgets.QComboBox, "comboBox_2")
+        self.add_barka_combo.setEnabled(False)
         if self.month == 1:
             m = "janvier"
         elif self.month == 2:
@@ -61,7 +66,11 @@ class RecapUi(QtWidgets.QMainWindow):
 
         elif self.service == "dentiste":
             self.title.setText("RECAP Service de chirurgie dentaire mois " + str(m) + "/" + str(self.year) + ":")
-
+            self.add_barka.setEnabled(True)
+            self.add_barka_combo.setEnabled(True)
+            den = load_workers("dentiste")
+            for worker in den:
+                self.add_barka_combo.addItem(worker[1])
         elif self.service == "labo":
             self.title.setText("RECAP Service de laboratoire mois " + str(m) + "/" + str(self.year) + ":")
 
@@ -87,6 +96,7 @@ class RecapUi(QtWidgets.QMainWindow):
 
         self.save.clicked.connect(self.save_)
         self.export.clicked.connect(self.export_)
+        self.add_barka.clicked.connect(self.add_)
 
     def alert_(self, message):
         alert = QMessageBox()
@@ -95,7 +105,7 @@ class RecapUi(QtWidgets.QMainWindow):
         alert.exec_()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        message = "Votre liste de RECAP na pas sauvgarder, es-tu sûr de quiter"
+        message = "Es-tu sûr de quiter"
         dialog = CustomDialog(message)
         if dialog.exec():
             self.next_page = app.AppUi(self.service)
@@ -194,3 +204,19 @@ class RecapUi(QtWidgets.QMainWindow):
 
             self.export.setEnabled(True)
             self.alert_("data saved")
+
+    def add_(self):
+        for row in range(self.table.rowCount()):
+            if not type(self.table.item(row, 2)) == PyQt5.QtWidgets.QTableWidgetItem:
+                index = row
+                break
+        print(index)
+
+        self.table.setRowHeight(index, 50)
+        self.table.setItem(index, 1, QTableWidgetItem(self.add_barka_combo.currentText()))
+        self.table.setItem(index, 2, QTableWidgetItem(str(0)))
+        self.table.setItem(index, 3, QTableWidgetItem(str(0)))
+        self.table.setItem(index, 4, QTableWidgetItem(str(0)))
+        total = 0 + 0 + 0
+        self.table.setItem(index, 5, QTableWidgetItem(str(0)))
+
