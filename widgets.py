@@ -15,4 +15,6 @@ class Chose_worker(QWidget):
 
 
 
+
+
         self.setLayout(widget)

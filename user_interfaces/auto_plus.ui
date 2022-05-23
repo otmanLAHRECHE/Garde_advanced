@@ -58,7 +58,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>461</width>
+     <width>381</width>
      <height>31</height>
     </rect>
    </property>
@@ -316,7 +316,7 @@
     <rect>
      <x>50</x>
      <y>240</y>
-     <width>51</width>
+     <width>141</width>
      <height>22</height>
     </rect>
    </property>
@@ -330,35 +330,12 @@
     <number>31</number>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_2">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>240</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(199, 238, 255);</string>
-   </property>
-   <item>
-    <property name="text">
-     <string>Matin</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Nuit</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QSpinBox" name="spinBox_2">
    <property name="geometry">
     <rect>
      <x>50</x>
      <y>280</y>
-     <width>51</width>
+     <width>141</width>
      <height>22</height>
     </rect>
    </property>
@@ -374,29 +351,6 @@
    <property name="maximum">
     <number>31</number>
    </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_3">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>280</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(199, 238, 255);</string>
-   </property>
-   <item>
-    <property name="text">
-     <string>Matin</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Nuit</string>
-    </property>
-   </item>
   </widget>
   <widget class="QLabel" name="label_7">
    <property name="geometry">
@@ -531,6 +485,26 @@
    <property name="styleSheet">
     <string notr="true">background-color: rgb(199, 238, 255);</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_2">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>10</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Type A</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Type B</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

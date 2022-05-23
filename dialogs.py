@@ -90,6 +90,7 @@ class Auto_plus(QtWidgets.QDialog):
         self.month = mois
 
         self.setWindowTitle("auto garde")
+        self.type = self.findChild(QtWidgets.QComboBox, "comboBox_2")
         self.agent = self.findChild(QtWidgets.QComboBox, "comboBox")
         self.add_agent = self.findChild(QtWidgets.QPushButton, "pushButton")
         self.empty_list_agents = self.findChild(QtWidgets.QPushButton, "pushButton_3")
@@ -97,8 +98,6 @@ class Auto_plus(QtWidgets.QDialog):
         self.radio_periode = self.findChild(QtWidgets.QRadioButton, "radioButton")
         self.start_day = self.findChild(QtWidgets.QSpinBox, "spinBox")
         self.end_day = self.findChild(QtWidgets.QSpinBox, "spinBox_2")
-        self.start_time = self.findChild(QtWidgets.QComboBox, "comboBox_2")
-        self.end_time = self.findChild(QtWidgets.QComboBox, "comboBox_3")
         self.jour_fr = self.findChild(QtWidgets.QSpinBox, "spinBox_3")
         self.add_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_2")
         self.empty_list_jour_fr = self.findChild(QtWidgets.QPushButton, "pushButton_4")
@@ -127,16 +126,12 @@ class Auto_plus(QtWidgets.QDialog):
     def radio_all_toggled(self, selected):
         if selected:
             self.start_day.setEnabled(False)
-            self.start_time.setEnabled(False)
             self.end_day.setEnabled(False)
-            self.end_time.setEnabled(False)
 
     def radio_periode_toggled(self, selected):
         if selected:
             self.start_day.setEnabled(True)
-            self.start_time.setEnabled(True)
             self.end_day.setEnabled(True)
-            self.end_time.setEnabled(True)
 
 
     def add_to_classemnt(self):

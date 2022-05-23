@@ -80,7 +80,7 @@ class GuardUi(QtWidgets.QMainWindow):
 
         if self.service == "urgence":
             self.ttl.setText("Planing de garde urgence mois " + str(m) + "/" + str(self.year) + ":")
-            self.auto_plus.setEnabled(False)
+
             self.load_med()
             self.load_guards()
 
@@ -91,13 +91,13 @@ class GuardUi(QtWidgets.QMainWindow):
 
         elif self.service == "labo":
             self.ttl.setText("Planing de garde laboratoire mois " + str(m) + "/" + str(self.year) + ":")
-            self.auto_plus.setEnabled(False)
+
             self.load_med()
             self.load_guards()
 
         elif self.service == "radio":
             self.ttl.setText("Planing de garde radiologie mois " + str(m) + "/" + str(self.year) + ":")
-            self.auto_plus.setEnabled(False)
+
             self.load_med()
             self.load_guards()
 
@@ -113,13 +113,13 @@ class GuardUi(QtWidgets.QMainWindow):
 
         elif self.service == "inf":
             self.ttl.setText("Planing de garde infirmiers d'urgences mois " + str(m) + "/" + str(self.year) + ":")
-            self.auto_plus.setEnabled(False)
+
             self.load_groups_inf()
             self.load_guards_inf()
 
         elif self.service == "surv":
             self.ttl.setText("Planing de garde surveillants d'urgences mois " + str(m) + "/" + str(self.year) + ":")
-            self.auto_plus.setEnabled(False)
+
             self.load_groups_surv()
             self.load_guards_surv()
 
@@ -506,22 +506,60 @@ class GuardUi(QtWidgets.QMainWindow):
                 index = 0
                 if dialog.radio_all.isChecked():
                     days = self.num_days
+                    days = days+1
 
-                    for day in range(days):
+                    for day in range(1, days):
                         row = day - 1
                         if index < len(list_med):
-                            self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
-                            if index == len(list_med) - 1:
-                                index = 0
-                            else:
+                            if self.table.cellWidget(row, 2).chose.isEnabled():
+                                self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
+                                if index == len(list_med) - 1:
+                                    index = 0
+                                else:
+                                    index = index + 1
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
                                 index = index + 1
-                            self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
-
+                            else:
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
                         else:
-                            print("ok")
+                            index = 0
+                            if self.table.cellWidget(row, 2).chose.isEnabled():
+                                self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                            else:
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
 
                 else:
                     st = int(dialog.start_day.text())
                     en = int(dialog.end_day.text())
+                    en = en + 1
 
+                    for day in range(st, en):
+                        row = day - 1
+                        if index < len(list_med):
+                            if self.table.cellWidget(row, 2).chose.isEnabled():
+                                self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
+                                if index == len(list_med) - 1:
+                                    index = 0
+                                else:
+                                    index = index + 1
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                            else:
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                        else:
+                            index = 0
+                            if self.table.cellWidget(row, 2).chose.isEnabled():
+                                self.table.cellWidget(row, 2).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
+                            else:
+                                self.table.cellWidget(row, 3).chose.setCurrentText(list_med[index])
+                                index = index + 1
 
