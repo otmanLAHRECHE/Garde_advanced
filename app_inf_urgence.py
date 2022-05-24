@@ -275,7 +275,6 @@ class AppInfUi(QtWidgets.QMainWindow):
                     self.thr = ThreadUpdateGroupe(int(self.table_workers_inf.item(row_selected, 0).text()),
                                                   dialog.nom.text(), dialog.groupe.currentText())
                     self.thr._signal.connect(self.signal_edit_worker_inf)
-                    self.thr._signal_list.connect(self.signal_edit_worker_inf)
                     self.thr._signal_result.connect(self.signal_edit_worker_inf)
                     self.thr.start()
 
@@ -308,7 +307,6 @@ class AppInfUi(QtWidgets.QMainWindow):
                     self.thr = ThreadUpdateGroupeSurv(int(self.table_workers_surv.item(row_selected, 0).text()),
                                                   dialog.nom.text(), dialog.groupe.currentText())
                     self.thr._signal.connect(self.signal_edit_worker_inf)
-                    self.thr._signal_list.connect(self.signal_edit_worker_inf)
                     self.thr._signal_result.connect(self.signal_edit_worker_inf)
                     self.thr.start()
 
@@ -320,7 +318,6 @@ class AppInfUi(QtWidgets.QMainWindow):
             self.dialog.progress.setValue(100)
             self.dialog.ttl.setText("Terminer")
             self.dialog.close()
-            self.worker_name.setText("")
             self.table_workers_inf.setRowCount(0)
             self.table_workers_surv.setRowCount(0)
             self.load_workers_all()
