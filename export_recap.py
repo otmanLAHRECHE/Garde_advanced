@@ -124,18 +124,6 @@ class ExportRecapUi(QtWidgets.QMainWindow):
             self.close()
 
 
-    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        message = "Es-tu sûr de quiter"
-        dialog = CustomDialog(message)
-
-        if dialog.exec():
-            self.next_page = app.AppUi(self.service)
-            self.next_page.show()
-            self.close()
-        else:
-            a0.ignore()
-
-
     def signal_accept(self, progress):
         if type(progress) == int:
             self.progress.setValue(progress)

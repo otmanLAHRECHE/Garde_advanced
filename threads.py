@@ -723,6 +723,7 @@ class Thread_save_recap(QThread):
         for row in range(self.table.rowCount()):
             prog = row * 100 / self.table.rowCount()
             if type(self.table.item(row, 2)) == PyQt5.QtWidgets.QTableWidgetItem:
+                print(self.table.item(row, 1).text())
                 id_agn = get_workerId_by_name(self.table.item(row, 1).text(), self.service)
                 id_agn = id_agn[0]
                 sql_q = 'SELECT recap.jo, recap.jw, recap.jf FROM recap INNER JOIN health_worker ON health_worker.worker_id = recap.agents_id where service=? and recap.agents_id =? and recap.m =? and recap.y =?'
