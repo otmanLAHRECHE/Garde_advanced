@@ -32,10 +32,6 @@ class RecapUi(QtWidgets.QMainWindow):
         self.export = self.findChild(QtWidgets.QPushButton, "pushButton_2")
         self.export.setIcon(QIcon("asstes/images/download.png"))
         self.export.setEnabled(False)
-        self.add_barka = self.findChild(QtWidgets.QPushButton, "pushButton_3")
-        self.add_barka.setEnabled(False)
-        self.add_barka_combo = self.findChild(QtWidgets.QComboBox, "comboBox_2")
-        self.add_barka_combo.setEnabled(False)
         if self.month == 1:
             m = "janvier"
         elif self.month == 2:
@@ -66,11 +62,7 @@ class RecapUi(QtWidgets.QMainWindow):
 
         elif self.service == "dentiste":
             self.title.setText("RECAP Service de chirurgie dentaire mois " + str(m) + "/" + str(self.year) + ":")
-            self.add_barka.setEnabled(True)
-            self.add_barka_combo.setEnabled(True)
-            den = load_workers("dentiste")
-            for worker in den:
-                self.add_barka_combo.addItem(worker[1])
+
         elif self.service == "labo":
             self.title.setText("RECAP Service de laboratoire mois " + str(m) + "/" + str(self.year) + ":")
 

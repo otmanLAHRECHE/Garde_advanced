@@ -262,7 +262,6 @@ class AppUi(QtWidgets.QMainWindow):
 
                     self.thr = ThreadUpdateWorker(int(self.table_workers.item(row_selected, 0).text()), dialog.worker.text())
                     self.thr._signal.connect(self.signal_edit_worker)
-                    self.thr._signal_list.connect(self.signal_edit_worker)
                     self.thr._signal_result.connect(self.signal_edit_worker)
                     self.thr.start()
 
