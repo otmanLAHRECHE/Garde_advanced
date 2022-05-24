@@ -4,7 +4,7 @@
 
 import sys
 from PyQt5 import uic, QtWidgets, QtCore
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtWidgets import QApplication, QGraphicsDropShadowEffect
 
 import chose_service
@@ -55,6 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("./icons/app_icon.png"))
     # app.setLayoutDirection(Qt.RightToLeft)
     window = MainWindow()
     window.show()
