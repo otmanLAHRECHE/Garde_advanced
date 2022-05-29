@@ -88,7 +88,6 @@ class RecapUi(QtWidgets.QMainWindow):
 
         self.save.clicked.connect(self.save_)
         self.export.clicked.connect(self.export_)
-        self.add_barka.clicked.connect(self.add_)
 
     def alert_(self, message):
         alert = QMessageBox()
@@ -197,18 +196,5 @@ class RecapUi(QtWidgets.QMainWindow):
             self.export.setEnabled(True)
             self.alert_("data saved")
 
-    def add_(self):
-        for row in range(self.table.rowCount()):
-            if not type(self.table.item(row, 2)) == PyQt5.QtWidgets.QTableWidgetItem:
-                index = row
-                break
-        print(index)
 
-        self.table.setRowHeight(index, 50)
-        self.table.setItem(index, 1, QTableWidgetItem(self.add_barka_combo.currentText()))
-        self.table.setItem(index, 2, QTableWidgetItem(str(0)))
-        self.table.setItem(index, 3, QTableWidgetItem(str(0)))
-        self.table.setItem(index, 4, QTableWidgetItem(str(0)))
-        total = 0 + 0 + 0
-        self.table.setItem(index, 5, QTableWidgetItem(str(0)))
 

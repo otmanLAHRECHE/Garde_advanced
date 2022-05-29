@@ -55,7 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("./icons/app_icon.png"))
+    app.setWindowIcon(QIcon("./icons/app_icon.ico"))
     # app.setLayoutDirection(Qt.RightToLeft)
     window = MainWindow()
     window.show()

@@ -267,8 +267,8 @@ class ThreadGuard(QThread):
                 light = "Dr/ "
                 night = "Dr/ "
             else:
-                light = ""
-                night = ""
+                light = " "
+                night = " "
             m = ""
             if x.strftime("%A") == "Saturday":
                 m = "Samedi"
