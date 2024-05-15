@@ -12,4 +12,3 @@ Garde_app_advanced
 
 ![Capture5](https://user-images.githubusercontent.com/30577764/197526323-fd2acf2d-8c46-4c44-b69f-ee8ee9babac3.PNG)
 
-![Capture6](https://user-images.githubusercontent.com/30577764/197526329-9055a0fb-151b-478e-b71e-0e0d62d4d080.PNG)
